@@ -417,11 +417,33 @@ func (bot Bots) SetGroupAnonymous(groupId int, enable bool) {
 }
 
 func (bot Bots) SetGroupName(groupId int, groupName string) {
-	panic("implement me")
+	requestUrl := "http://%s:%d"+"/set_group_name?"
+	requestUrl += "group_id=%d"
+	requestUrl += "&group_name=%s"
+	url := fmt.Sprintf(requestUrl,bot.Address,bot.Port,groupId,groupName)
+	response, err1 := http.Get(url)
+	if err1 != nil {
+		log.Panicf("上报到%s:%d失败\n", bot.Address, bot.Port)
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &defaultJson)
+	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
 }
 
 func (bot Bots) SetGroupLeave(groupId int, isDisMiss bool) {
-	panic("implement me")
+	requestUrl := "http://%s:%d"+"/set_group_leave?"
+	requestUrl += "group_id=%d"
+	requestUrl += "&is_dis_miss=%s"
+	url := fmt.Sprintf(requestUrl,bot.Address,bot.Port,groupId,strconv.FormatBool(isDisMiss))
+	response, err1 := http.Get(url)
+	if err1 != nil {
+		log.Panicf("上报到%s:%d失败\n", bot.Address, bot.Port)
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &defaultJson)
+	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
 }
 
 func (bot Bots) SetGroupSpecialTitle(groupId int, userId int, specialTitle string, duration int) {

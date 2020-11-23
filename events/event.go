@@ -1,6 +1,5 @@
 package events
 
-
 import (
 	"encoding/json"
 	"github.com/3343780376/go-mybots/api"
@@ -9,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 )
+
 var (
 	ViewMessage []func(event api.Event)
 	ViewNotice  []func(event api.Event)
