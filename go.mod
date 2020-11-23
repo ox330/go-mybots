@@ -1,4 +1,4 @@
-module github/3343780376/go-mybots
+module github.com/3343780376/go-mybots
 
 go 1.14
 
