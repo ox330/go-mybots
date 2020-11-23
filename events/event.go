@@ -3,8 +3,8 @@ package events
 
 import (
 	"encoding/json"
-	"github/3343780376/go-mybots/api"
-	"github/3343780376/go-mybots/test"
+	"github.com/3343780376/go-mybots/api"
+	"github.com/3343780376/go-mybots/test"
 	"io"
 	"io/ioutil"
 	"log"

@@ -1,8 +1,8 @@
 package urls
 
 import (
+	"github.com/3343780376/go-mybots/events"
 	"github.com/gin-gonic/gin"
-	"github/3343780376/go-mybots/events"
 	"net/http"
 )
 

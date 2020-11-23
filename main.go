@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github/3343780376/go-mybots/urls"
+	"github.com/3343780376/go-mybots/urls"
 	"log"
 )
 
