@@ -2,10 +2,9 @@ package urls
 
 import (
 	"github.com/gin-gonic/gin"
-	"gononebot/events"
+	"github/3343780376/go-mybots/events"
 	"net/http"
 )
-
 
 func Hand() *gin.Engine {
 	rout := gin.New()
@@ -17,5 +16,3 @@ func Hand() *gin.Engine {
 	})
 	return rout
 }
-
-

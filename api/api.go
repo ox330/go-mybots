@@ -342,7 +342,7 @@ func (bot Bots) SetGroupKick(groupId int, UserId int, rejectAddRequest bool) {
 	requestUrl := "http://%s:%d"+"/set_group_kick?"
 	requestUrl += "group_id=%d"
 	requestUrl += "&user_id=%d"
-	requestUrl += "reject_add_request=%s"
+	requestUrl += "&reject_add_request=%s"
 	url := fmt.Sprintf(requestUrl,bot.Address,bot.Port,groupId,UserId,strconv.FormatBool(rejectAddRequest))
 	response, err1 := http.Get(url)
 	if err1 != nil {
@@ -358,7 +358,7 @@ func (bot Bots) SetGroupAnonymousBan(groupId int, flag string, duration int) {
 	requestUrl := "http://%s:%d"+"/set_group_anonymous_ban?"
 	requestUrl += "group_id=%d"
 	requestUrl += "&flag=%s"
-	requestUrl += "duration=%d"
+	requestUrl += "&duration=%d"
 	url := fmt.Sprintf(requestUrl,bot.Address,bot.Port,groupId,flag,duration)
 	response, err1 := http.Get(url)
 	if err1 != nil {
@@ -373,7 +373,7 @@ func (bot Bots) SetGroupAnonymousBan(groupId int, flag string, duration int) {
 func (bot Bots) SetGroupWholeBan(groupId int, enable bool) {
 	requestUrl := "http://%s:%d"+"/set_group_whole_ban?"
 	requestUrl += "group_id=%d"
-	requestUrl += "enable=%s"
+	requestUrl += "&enable=%s"
 	url := fmt.Sprintf(requestUrl,bot.Address,bot.Port,groupId,strconv.FormatBool(enable))
 	response, err1 := http.Get(url)
 	if err1 != nil {
@@ -386,11 +386,34 @@ func (bot Bots) SetGroupWholeBan(groupId int, enable bool) {
 }
 
 func (bot Bots) SetGroupAdmin(groupId int, UserId int, enable bool) {
-	panic("implement me")
+	requestUrl := "http://%s:%d"+"/set_group_admin?"
+	requestUrl += "group_id=%d"
+	requestUrl += "&user_id=%d"
+	requestUrl += "&enable=%s"
+	url := fmt.Sprintf(requestUrl,bot.Address,bot.Port,groupId,UserId,strconv.FormatBool(enable))
+	response, err1 := http.Get(url)
+	if err1 != nil {
+		log.Panicf("上报到%s:%d失败\n", bot.Address, bot.Port)
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &defaultJson)
+	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
 }
 
 func (bot Bots) SetGroupAnonymous(groupId int, enable bool) {
-	panic("implement me")
+	requestUrl := "http://%s:%d"+"/set_group_anonymous?"
+	requestUrl += "group_id=%d"
+	requestUrl += "&enable=%s"
+	url := fmt.Sprintf(requestUrl,bot.Address,bot.Port,groupId,strconv.FormatBool(enable))
+	response, err1 := http.Get(url)
+	if err1 != nil {
+		log.Panicf("上报到%s:%d失败\n", bot.Address, bot.Port)
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &defaultJson)
+	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
 }
 
 func (bot Bots) SetGroupName(groupId int, groupName string) {

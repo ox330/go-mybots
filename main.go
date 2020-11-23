@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gononebot/urls"
+	"github/3343780376/go-mybots/urls"
 	"log"
 )
 
