@@ -40,4 +40,3 @@ clone本项目，修改main.go的run地址为上面所填写的post_urls，修�
 具体实现更多的逻辑，可先参考onebot[文档](https://github.com/howmanybots/onebot)。
 
 ###本人为新手初学，不喜勿喷。
-
