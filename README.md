@@ -2,7 +2,7 @@
 
 go进行onebot的http简单实现
 
-##基本使用
+## 基本使用
 首先需要一个qq无头客户端和一个go运行环境。
 
 [go语言下载官网](https://golang.org/)  !!国内可访问<https://studygolang.com/dl>下载
@@ -39,4 +39,4 @@ clone本项目，修改main.go的run地址为上面所填写的post_urls，修�
 
 具体实现更多的逻辑，可先参考onebot[文档](https://github.com/howmanybots/onebot)。
 
-###本人为新手初学，不喜勿喷。
+### 本人为新手初学，不喜勿喷。
