@@ -1,4 +1,4 @@
-package api
+package go_mybots
 
 import (
 	"encoding/json"
@@ -23,9 +23,9 @@ type Message struct {
 
 
 type MessageAction interface {
-	Append(message string)Message
-	MessageImage(path string)Message
-	MessageAt(UserId int)Message
+	Append(message string) Message
+	MessageImage(path string) Message
+	MessageAt(UserId int) Message
 }
 
 type MessageIds struct {
@@ -43,7 +43,7 @@ type Event struct {
 	Anonymous     anonymous `json:"anonymous"`
 	Font          string    `json:"font"`
 	GroupId       int       `json:"group_id"`
-	Message       Message    `json:"message"`
+	Message       string    `json:"message"`
 	MessageType   string    `json:"message_type"`
 	PostType      string    `json:"post_type"`
 	RawMessage    string    `json:"raw_message"`
@@ -127,12 +127,12 @@ type (
 	}
 
 	GetMessage struct {
-		Time        int32        `json:"time"`
-		Group 		bool     	 `json:"group"`
-		MessageId   int32        `json:"message_id"`
-		RealId      int32        `json:"real_id"`
-		Sender      Senders 	 `json:"sender"`
-		Message     string		 `json:"message"`
+		Time      int32   `json:"time"`
+		Group     bool    `json:"group"`
+		MessageId int32   `json:"message_id"`
+		RealId    int32   `json:"real_id"`
+		Sender    Senders `json:"sender"`
+		Message   string  `json:"message"`
 	}
 
 	FriendList struct {
@@ -149,13 +149,13 @@ type (
 	}
 
 	GroupHonorInfo struct {
-		GroupId int `json:"group_id"`
-		CurrentTalkative CurrentTalkativeS `json:"current_talkative"`
-		TalkativeList []GroupHonorInfoList `json:"talkative_list"`
-		PerformerList []GroupHonorInfoList `json:"performer_list"`
-		LegendList    []GroupHonorInfoList `json:"legend_list"`
+		GroupId          int                  `json:"group_id"`
+		CurrentTalkative CurrentTalkativeS    `json:"current_talkative"`
+		TalkativeList    []GroupHonorInfoList `json:"talkative_list"`
+		PerformerList    []GroupHonorInfoList `json:"performer_list"`
+		LegendList       []GroupHonorInfoList `json:"legend_list"`
 		StrongNewbieList []GroupHonorInfoList `json:"strong_newbie_list"`
-		EmotionList  []GroupHonorInfoList `json:"emotion_list"`
+		EmotionList      []GroupHonorInfoList `json:"emotion_list"`
 	}
 
 	CurrentTalkativeS struct {
@@ -267,32 +267,32 @@ type Api interface {
 	SetFriendAddRequest(flag string,approve bool,remark string)
 	SetGroupAddRequest(flag string,subType string,approve bool,reason string)
 	GetLoginInfo() LoginInfo
-	GetStrangerInfo()Senders
+	GetStrangerInfo() Senders
 	GetFriendList()[]FriendList
-	GetGroupInfo(groupId int,noCache bool)GroupInfo
+	GetGroupInfo(groupId int,noCache bool) GroupInfo
 	GetGroupList()[]GroupInfo
-	GetGroupMemberInfo(groupId int,UserId int,noCache bool)GroupMemberInfo
+	GetGroupMemberInfo(groupId int,UserId int,noCache bool) GroupMemberInfo
 	GetGroupMemberList(groupId int)[]GroupMemberInfo
-	GetGroupHonorInfo(groupId int,honorType string)GroupHonorInfo
-	GetCookies(domain string)Cookie
-	GetCsrfToken()CsrfToken
-	GetCredentials(domain string)Credentials
-	GetRecord()Record
+	GetGroupHonorInfo(groupId int,honorType string) GroupHonorInfo
+	GetCookies(domain string) Cookie
+	GetCsrfToken() CsrfToken
+	GetCredentials(domain string) Credentials
+	GetRecord() Record
 	GetImage(file string)
-	CanSendImage()Bool
-	CanSendRecord()Bool
-	GetStatus()OnlineStatus
+	CanSendImage() Bool
+	CanSendRecord() Bool
+	GetStatus() OnlineStatus
 }
 
 var (
-	responseMsgJson responseMessageJson
-	getMessageJson getMsgJson
-	defaultJson defaultResponseJson
-	LoginInfoJson responseLoginIndoJson
-	StrangerInfo responseStrangerInfoJson
-	FriendListJson responseFriendListJson
-	GroupInfoJson responseGroupInfoJson
-	GroupListJson responseGroupListJson
+	responseMsgJson     responseMessageJson
+	getMessageJson      getMsgJson
+	defaultJson         defaultResponseJson
+	LoginInfoJson       responseLoginIndoJson
+	StrangerInfo        responseStrangerInfoJson
+	FriendListJson      responseFriendListJson
+	GroupInfoJson       responseGroupInfoJson
+	GroupListJson       responseGroupListJson
 	GroupMemberInfoJson responseGroupMemberInfoJson
 	GroupMemberListJson responseGroupMemberListJson
 )
@@ -310,7 +310,7 @@ func (bot Bots) SendGroupMsg(groupId int,message string,autoEscape bool) int32  
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &responseMsgJson)
-	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 	return responseMsgJson.Data.MessageId
 }
 
@@ -329,7 +329,7 @@ func (bot Bots) SendPrivateMsg(userId int, message string,autoEscape bool) int32
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &responseMsgJson)
-	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 	return responseMsgJson.Data.MessageId
 }
 
@@ -355,7 +355,7 @@ func (bot Bots) GetMsg(messageId int32) GetMessage {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	err := json.Unmarshal(responseByte, &getMessageJson)
-	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 	if err != nil {
 		panic(err)
 	}
@@ -388,7 +388,7 @@ func (bot Bots) SetGroupCard(groupId int, userId int, card string) {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
-	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 
 }
 
@@ -416,7 +416,7 @@ func (bot Bots) SendLike(userId int, times int) {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
-	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 }
 
 func (bot Bots) SetGroupKick(groupId int, UserId int, rejectAddRequest bool) {
@@ -432,7 +432,7 @@ func (bot Bots) SetGroupKick(groupId int, UserId int, rejectAddRequest bool) {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
-	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 }
 
 func (bot Bots) SetGroupAnonymousBan(groupId int, flag string, duration int) {
@@ -448,7 +448,7 @@ func (bot Bots) SetGroupAnonymousBan(groupId int, flag string, duration int) {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
-	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 }
 
 func (bot Bots) SetGroupWholeBan(groupId int, enable bool) {
@@ -463,7 +463,7 @@ func (bot Bots) SetGroupWholeBan(groupId int, enable bool) {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
-	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 }
 
 func (bot Bots) SetGroupAdmin(groupId int, UserId int, enable bool) {
@@ -479,7 +479,7 @@ func (bot Bots) SetGroupAdmin(groupId int, UserId int, enable bool) {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
-	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 }
 
 func (bot Bots) SetGroupAnonymous(groupId int, enable bool) {
@@ -494,7 +494,7 @@ func (bot Bots) SetGroupAnonymous(groupId int, enable bool) {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
-	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 }
 
 func (bot Bots) SetGroupName(groupId int, groupName string) {
@@ -509,7 +509,7 @@ func (bot Bots) SetGroupName(groupId int, groupName string) {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
-	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 }
 
 func (bot Bots) SetGroupLeave(groupId int, isDisMiss bool) {
@@ -524,7 +524,7 @@ func (bot Bots) SetGroupLeave(groupId int, isDisMiss bool) {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
-	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 }
 
 func (bot Bots) SetGroupSpecialTitle(groupId int, userId int, specialTitle string, duration int) {
@@ -541,7 +541,7 @@ func (bot Bots) SetGroupSpecialTitle(groupId int, userId int, specialTitle strin
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
-	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 }
 
 func (bot Bots) SetFriendAddRequest(flag string, approve bool, remark string) {
@@ -557,7 +557,7 @@ func (bot Bots) SetFriendAddRequest(flag string, approve bool, remark string) {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
-	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 }
 
 func (bot Bots) SetGroupAddRequest(flag string, subType string, approve bool, reason string) {
@@ -574,7 +574,7 @@ func (bot Bots) SetGroupAddRequest(flag string, subType string, approve bool, re
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
-	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 }
 
 func (bot Bots) GetLoginInfo() LoginInfo {
@@ -587,7 +587,7 @@ func (bot Bots) GetLoginInfo() LoginInfo {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &LoginInfoJson)
-	log.Println(url,"\n\t\t\t\t\t",defaultJson.RetCode,defaultJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 	return LoginInfoJson.Data
 }
 
@@ -601,7 +601,7 @@ func (bot Bots) GetStrangerInfo() Senders {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &StrangerInfo)
-	log.Println(url,"\n\t\t\t\t\t",StrangerInfo.RetCode,StrangerInfo.Status)
+	log.Println(url,"\n\t\t\t\t\t", StrangerInfo.RetCode, StrangerInfo.Status)
 	return StrangerInfo.Data
 }
 
@@ -615,7 +615,7 @@ func (bot Bots) GetFriendList() []FriendList {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &FriendListJson)
-	log.Println(url,"\n\t\t\t\t\t",FriendListJson.RetCode,FriendListJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", FriendListJson.RetCode, FriendListJson.Status)
 	return FriendListJson.Data
 }
 
@@ -631,7 +631,7 @@ func (bot Bots) GetGroupInfo(groupId int, noCache bool) GroupInfo {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &GroupInfoJson)
-	log.Println(url,"\n\t\t\t\t\t",GroupInfoJson.RetCode,GroupInfoJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", GroupInfoJson.RetCode, GroupInfoJson.Status)
 	return  GroupInfoJson.Data
 }
 
@@ -645,7 +645,7 @@ func (bot Bots) GetGroupList() []GroupInfo {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &GroupListJson)
-	log.Println(url,"\n\t\t\t\t\t",GroupListJson.RetCode,GroupListJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", GroupListJson.RetCode, GroupListJson.Status)
 	return GroupListJson.Data
 }
 
@@ -662,7 +662,7 @@ func (bot Bots) GetGroupMemberInfo(groupId int, UserId int, noCache bool) GroupM
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &GroupMemberInfoJson)
-	log.Println(url,"\n\t\t\t\t\t",GroupMemberInfoJson.RetCode,GroupMemberInfoJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", GroupMemberInfoJson.RetCode, GroupMemberInfoJson.Status)
 	return GroupMemberInfoJson.Data
 }
 
@@ -677,7 +677,7 @@ func (bot Bots) GetGroupMemberList(groupId int) []GroupMemberInfo {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &GroupMemberListJson)
-	log.Println(url,"\n\t\t\t\t\t",GroupMemberListJson.RetCode,GroupMemberListJson.Status)
+	log.Println(url,"\n\t\t\t\t\t", GroupMemberListJson.RetCode, GroupMemberListJson.Status)
 	return GroupMemberListJson.Data
 }
 

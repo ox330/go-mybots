@@ -3,8 +3,6 @@ package go_mybots
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/3343780376/go-mybots/api"
-	"github.com/3343780376/go-mybots/test"
 	"io"
 	"io/ioutil"
 	"log"
@@ -12,41 +10,35 @@ import (
 )
 
 var (
-	ViewMessage     []func(event api.Event)
-	ViewNotice      []func(event api.Event)
-	ViewRequest     []func(event api.Event)
-	ViewMeta        []func(event api.Event)
+	ViewMessage     []func(event Event)
+	ViewNotice      []func(event Event)
+	ViewRequest     []func(event Event)
+	ViewMeta        []func(event Event)
 	ViewOnCoCommand []ViewOnC0CommandApi
-	info            api.LoginInfo
+	Info            LoginInfo
 )
 
 
 type ViewOnC0CommandApi struct {
-	CoCommand func(event api.Event,args []string)
-	content   string
+	CoCommand func(event Event,args []string)
+	Content   string
 	Allies    string
 	OnlyToMe  bool
 }
 
 func init() {
-	info = test.Bot.GetLoginInfo()
-	ViewOnCoCommand = append(ViewOnCoCommand, ViewOnC0CommandApi{test.DefaultOnCoCommand, "weather","天气", true})
-	ViewMessage = append(ViewMessage, test.DefaultMessageHandle)
-	ViewMessage = append(ViewMessage, test.MessageTest)
-	ViewNotice = append(ViewNotice,test.DefaultNoticeHandle)
-	ViewRequest = append(ViewRequest,test.DefaultRequestHandle)
-	ViewMeta = append(ViewMeta,test.DefaultMetaHandle)
+
 }
 
 func EventMain(body io.Reader)  {
-	var event api.Event
+	var event Event
 	form, _ := ioutil.ReadAll(body)
 	_ = json.Unmarshal(form, &event)
 	viewsMessage(event)
 }
 
 
-func viewsMessage(event api.Event)  {
+func viewsMessage(event Event)  {
 	switch event.PostType {
 	case "message":
 		processMessageHandle(event)
@@ -71,14 +63,14 @@ func viewsMessage(event api.Event)  {
 	}
 }
 
-func processMessageHandle(event api.Event)  {
+func processMessageHandle(event Event)  {
 	for _,v := range ViewOnCoCommand {
-		onlyToMe := strings.Contains(event.Message.Message,fmt.Sprintf("[CQ:at,qq=%d]", info.UserId))
-		content := strings.HasPrefix(event.Message.Message,v.content)
-		allies := strings.HasPrefix(event.Message.Message,v.Allies)
+		onlyToMe := strings.Contains(event.Message,fmt.Sprintf("[CQ:at,qq=%d]", Info.UserId))
+		content := strings.HasPrefix(event.Message,v.Content)
+		allies := strings.HasPrefix(event.Message,v.Allies)
 		log.Println(onlyToMe,content,allies)
 		if onlyToMe == v.OnlyToMe && (content||allies){
-			go v.CoCommand(event,strings.Fields(event.Message.Message))
+			go v.CoCommand(event,strings.Fields(event.Message))
 			log.Printf("message_type:%s\n\t\t\t\t\tgroup_id:%d\n\t\t\t\t\tuser_id:%d\n\t\t\t\t\tmessage:%s",
 				event.MessageType,event.GroupId,event.UserId,event.Message)
 			return

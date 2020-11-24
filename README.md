@@ -34,8 +34,43 @@ go进行onebot的http简单实现
 
 enable设置为true，host和port是go-cqhttp所监听的ip和端口，post_url为go-cqhttp事件上报地址,注意post_urls填写格式。
 
-clone本项目，修改main.go的run地址为上面所填写的post_urls，修改test文件夹下test.go的Adress和port，与上面所配置的adress和port
-相同，修改Admin为你自己所使用的qq号，此时运行main.go，然后用所设置的admin账号给bot发送私聊信息"hello",此时会收到bot回复的"hello world".
+`go get github.com/3343780376/go-mybots`
+
+创建一个项目，main.go
+
+```
+import (
+	"github.com/3343780376/go-mybots"
+	"log"
+)
+
+//实例化一个Bot对象，参数为go-cqhttp监听的地址和端口，以及你的作为测试给bot发信息的账号
+var Bot = go_mybots.Bots{Address: "127.0.0.1", Port: 5700,Admin: 1743224847}
+
+//将handle函数加入go_mybots的消息路由
+func init(){
+    go_mybots.ViewMessage = append(go_mybots.ViewMessage, handle)
+}
+
+func main() {
+	hand := go_mybots.Hand()
+	err := hand.Run("127.0.0.1:8000")  //设置该项目监听地址，及为go-cqhttp的上报地址
+	if err != nil {
+		log.Println(err.Error())
+	}
+}
+
+//event参数为上报的消息，详情可参考onebot文档
+func handle(event go-mybots.events){
+    //判断消息为hello且发送消息的账号为测试账号
+    if event.Message=="hello"&&event.UserId== Bot.Admin {
+            //异步调用SendGroupMsg这个api,三个参数分别为，发送的对象qq号，消息内容和是否解析cq码
+    		go Bot.SendPrivateMsg(event.UserId,"hello,world",false)
+    	}
+}
+```
+
+此时使用测试的qq号给bot发送hello，即可看到<img src="" />
 
 具体实现更多的逻辑，可先参考onebot[文档](https://github.com/howmanybots/onebot)。
 
