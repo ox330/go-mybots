@@ -18,7 +18,7 @@ func init() {
 
 func DefaultMessageHandle(event go_mybots.Event)  {
 	if event.Message=="hello"&&event.UserId== Bot.Admin {
-		go Bot.SendPrivateMsg(event.UserId,"hello,world",false)
+		go Bot.SendPrivateMsg(event.UserId,"hello   world",false)
 	}
 }
 

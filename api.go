@@ -1,6 +1,7 @@
 package go_mybots
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -298,14 +299,18 @@ var (
 )
 
 func (bot Bots) SendGroupMsg(groupId int,message string,autoEscape bool) int32  {
-	requestUrl := "http://%s:%d/send_group_msg?"
-	requestUrl += "group_id=%d"
-	requestUrl += "&message=%s"
-	requestUrl += "&auto_escape=%v"
-	url := fmt.Sprintf(requestUrl,bot.Address, bot.Port, groupId,message,autoEscape)
-	response, err1 := http.Get(url)
-	if err1 != nil {
-		log.Panicf("上报到%s:%d失败\n", bot.Address, bot.Port)
+	url := fmt.Sprintf("http://%s:%d/send_group_msg",bot.Address,bot.Port)
+	data := fmt.Sprintf("{\"group_id\":%d,\"message\":\"%s\",\"auto_escape\":%v}",groupId,message,autoEscape)
+	log.Println(data)
+	req ,err := http.NewRequest("POST",url,bytes.NewBuffer([]byte(data)))
+	if err != nil {
+		log.Panic("newRequest error")
+	}
+	req.Header.Set("Content-Type", "application/json")
+	client := http.Client{}
+	response, err := client.Do(req)
+	if err != nil {
+		log.Panic("client error")
 	}
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
@@ -317,14 +322,18 @@ func (bot Bots) SendGroupMsg(groupId int,message string,autoEscape bool) int32  
 
 
 func (bot Bots) SendPrivateMsg(userId int, message string,autoEscape bool) int32 {
-	requestUrl := "http://%s:%d/send_private_msg?"
-	requestUrl += "user_id=%d"
-	requestUrl += "&message=%s"
-	requestUrl += "&auto_escape=%s"
-	url := fmt.Sprintf(requestUrl, bot.Address,bot.Port, userId,message,strconv.FormatBool(autoEscape))
-	response, err1 := http.Get(url)
-	if err1 != nil {
-		log.Panicf("上报到%s:%d失败\n", bot.Address, bot.Port)
+	url := fmt.Sprintf("http://%s:%d/send_private_msg",bot.Address,bot.Port)
+	data := fmt.Sprintf("{\"user_id\":%d,\"message\":\"%s\",\"auto_escape\":%v}",userId,message,autoEscape)
+	log.Println(data)
+	req ,err := http.NewRequest("POST",url,bytes.NewBuffer([]byte(data)))
+	if err != nil {
+		log.Panic("newRequest error")
+	}
+	req.Header.Set("Content-Type", "application/json")
+	client := http.Client{}
+	response, err := client.Do(req)
+	if err != nil {
+		log.Panic("client error")
 	}
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
