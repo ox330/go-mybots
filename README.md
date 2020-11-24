@@ -38,5 +38,3 @@ clone本项目，修改main.go的run地址为上面所填写的post_urls，修�
 相同，修改Admin为你自己所使用的qq号，此时运行main.go，然后用所设置的admin账号给bot发送私聊信息"hello",此时会收到bot回复的"hello world".
 
 具体实现更多的逻辑，可先参考onebot[文档](https://github.com/howmanybots/onebot)。
-
-### 本人为新手初学，不喜勿喷。
