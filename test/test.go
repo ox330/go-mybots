@@ -5,7 +5,7 @@ import (
 )
 var Bot = api.Bots{Address: "127.0.0.1", Port: 5700,Admin: 1743224847}
 func DefaultMessageHandle(event api.Event)  {
-	if event.Message=="hello"&&event.UserId==Bot.Admin {
+	if event.Message.Message=="hello"&&event.UserId==Bot.Admin {
 		go Bot.DeleteMsg(event.MessageId)
 	}
 }

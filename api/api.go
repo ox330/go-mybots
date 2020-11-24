@@ -16,6 +16,18 @@ type Bots struct {
 	Admin   int
 }
 
+type Message struct {
+	Message string `json:"message"`
+}
+
+
+
+type MessageAction interface {
+	Append(message string)Message
+	MessageImage(path string)Message
+	MessageAt(UserId int)Message
+}
+
 type MessageIds struct {
 	MessageId int32 `json:"message_id"`
 }
@@ -27,13 +39,11 @@ type LoginInfo struct {
 
 
 
-
-
 type Event struct {
 	Anonymous     anonymous `json:"anonymous"`
 	Font          string    `json:"font"`
 	GroupId       int       `json:"group_id"`
-	Message       string    `json:"message"`
+	Message       Message    `json:"message"`
 	MessageType   string    `json:"message_type"`
 	PostType      string    `json:"post_type"`
 	RawMessage    string    `json:"raw_message"`
@@ -705,4 +715,16 @@ func (bot Bots) CanSendRecord() Bool {
 
 func (bot Bots) GetStatus() OnlineStatus {
 	panic("implement me")
+}
+
+func (m Message) Append(message string) Message {
+	return Message{m.Message + message}
+}
+
+func (m Message) MessageImage(path string) Message {
+	return Message{fmt.Sprintf("[CQ:image.file=file:/%s]",path)}
+}
+
+func (m Message) MessageAt(UserId int) Message {
+	return Message{fmt.Sprintf("[CQ:at:qq=%d]",UserId)}
 }
