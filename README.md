@@ -70,7 +70,9 @@ func handle(event go-mybots.events){
 }
 ```
 
-此时使用测试的qq号给bot发送hello，即可看到<img src="https://github.com/3343780376/go-mybots/blob/master/test1.png" />
+此时使用测试的qq号给bot发送hello，即可看到
+
+<img src="https://github.com/3343780376/go-mybots/blob/master/test1.png" />
 
 具体实现更多的逻辑，可先参考onebot[文档](https://github.com/howmanybots/onebot)。
 
