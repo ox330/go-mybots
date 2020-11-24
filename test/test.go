@@ -11,7 +11,9 @@ func DefaultMessageHandle(event api.Event)  {
 }
 
 func MessageTest(event api.Event)  {
-
+	if event.GroupId == 972264701{
+		Bot.SendGroupMsg(event.GroupId,event.Message.Message,false)
+	}
 }
 
 func DefaultNoticeHandle(event api.Event)  {

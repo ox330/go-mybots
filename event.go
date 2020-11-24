@@ -1,4 +1,4 @@
-package events
+package go_mybots
 
 import (
 	"encoding/json"
@@ -72,13 +72,13 @@ func viewsMessage(event api.Event)  {
 }
 
 func processMessageHandle(event api.Event)  {
-	for _,v := range ViewOnCoCommand{
-		onlyToMe := strings.Contains(event.Message,fmt.Sprintf("[CQ:at,qq=%d]",info.UserId))
-		content := strings.HasPrefix(event.Message,v.content)
-		allies := strings.HasPrefix(event.Message,v.Allies)
+	for _,v := range ViewOnCoCommand {
+		onlyToMe := strings.Contains(event.Message.Message,fmt.Sprintf("[CQ:at,qq=%d]", info.UserId))
+		content := strings.HasPrefix(event.Message.Message,v.content)
+		allies := strings.HasPrefix(event.Message.Message,v.Allies)
 		log.Println(onlyToMe,content,allies)
 		if onlyToMe == v.OnlyToMe && (content||allies){
-			go v.CoCommand(event,strings.Fields(event.Message))
+			go v.CoCommand(event,strings.Fields(event.Message.Message))
 			log.Printf("message_type:%s\n\t\t\t\t\tgroup_id:%d\n\t\t\t\t\tuser_id:%d\n\t\t\t\t\tmessage:%s",
 				event.MessageType,event.GroupId,event.UserId,event.Message)
 			return
