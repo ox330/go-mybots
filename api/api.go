@@ -9,32 +9,25 @@ import (
 	"strconv"
 )
 
-type MessageIds struct {
-	MessageId int32 `json:"message_id"`
-}
+
 type Bots struct {
 	Address string
 	Port    int
 	Admin   int
 }
+
+type MessageIds struct {
+	MessageId int32 `json:"message_id"`
+}
+
 type LoginInfo struct {
 	UserId int `json:"user_id"`
 	NickName string `json:"nick_name"`
 }
 
 
-type anonymous struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
-	Flag string `json:"flag"`
-}
 
-type Files struct {
-	Id    string `json:"id"`
-	Name  string `json:"name"`
-	Size  int64  `json:"size"`
-	Busid int64  `json:"busid"`
-}
+
 
 type Event struct {
 	Anonymous     anonymous `json:"anonymous"`
@@ -76,43 +69,13 @@ type Senders struct {
 	UserId   int    `json:"user_id"`
 }
 
-type GroupMemberInfo struct {
-	GroupId int `json:"group_id"`
-	JoinTime int `json:"join_time"`
-	LastSentTime int `json:"last_sent_time"`
-	Unfriendly bool `json:"unfriendly"`
-	TitleExpireTime int `json:"title_expire_time"`
-	CardChangeable bool `json:"card_changeable"`
-	Senders
-}
+
 
 type responseJson struct {
 	Status  string `json:"status"`
 	RetCode int    `json:"retcode"`
 }
-type responseLoginIndoJson struct {
-	responseJson
-	Data LoginInfo `json:"data"`
-}
 
-type responseMessageJson struct {
-	responseJson
-	Data MessageIds `json:"data"`
-}
-
-type getMsgJson struct {
-	responseJson
-	Data GetMessage `json:"data"`
-}
-
-type GetMessage struct {
-	Time        int32        `json:"time"`
-	Group 		bool     	 `json:"group"`
-	MessageId   int32        `json:"message_id"`
-	RealId      int32        `json:"real_id"`
-	Sender      Senders 	 `json:"sender"`
-	Message     string		 `json:"message"`
-}
 
 type Send interface {
 	SendGroupMsg(groupId int, message string,autoEscape bool) int32
@@ -122,90 +85,163 @@ type Send interface {
 	SetGroupBan(groupId int, userId int, duration int)
 	SetGroupCard(groupId int, userId int, card string)
 }
-type FriendList struct {
-	UserId int `json:"user_id"`
-	NickName string `json:"nick_name"`
-	Remark string `json:"remark"`
-}
-type responseFriendListJson struct {
-	responseJson
-	Data []FriendList `json:"data"`
-}
 
 
-type GroupInfo struct {
-	GroupId int `json:"group_id"`
-	GroupName string `json:"group_name"`
-	MemberCount int `json:"member_count"`
-	MaxMemberCount int `json:"max_member_count"`
-}
-type responseGroupInfoJson struct {
-	responseJson
-	Data GroupInfo `json:"data"`
-}
+type (
+	anonymous struct {
+		Id   int    `json:"id"`
+		Name string `json:"name"`
+		Flag string `json:"flag"`
+	}
 
-type GroupHonorInfo struct {
-	GroupId int `json:"group_id"`
-	CurrentTalkative CurrentTalkativeS `json:"current_talkative"`
-	TalkativeList []GroupHonorInfoList `json:"talkative_list"`
-	PerformerList []GroupHonorInfoList `json:"performer_list"`
-	LegendList    []GroupHonorInfoList `json:"legend_list"`
-	StrongNewbieList []GroupHonorInfoList `json:"strong_newbie_list"`
-	EmotionList  []GroupHonorInfoList `json:"emotion_list"`
-}
-type CurrentTalkativeS struct {
-	UserId int `json:"user_id"`
-	NickName string `json:"nick_name"`
-	Avatar string `json:"avatar"`
-	DayCount int `json:"day_count"`
-}
-type GroupHonorInfoList struct {
-	UserId int `json:"user_id"`
-	NickName string `json:"nick_name"`
-	Avatar string `json:"avatar"`
-	Description string `json:"description"`
-}
-type Record struct {
-	File string	`json:"file"`
-	OutFormat string `json:"out_format"`
-}
-type Cookie struct {
-	Cookies string `json:"cookies"`
-}
+	Files struct {
+		Id    string `json:"id"`
+		Name  string `json:"name"`
+		Size  int64  `json:"size"`
+		Busid int64  `json:"busid"`
+	}
 
-type CsrfToken struct {
-	Token string `json:"token"`
-}
+	GroupMemberInfo struct {
+		GroupId int `json:"group_id"`
+		JoinTime int `json:"join_time"`
+		LastSentTime int `json:"last_sent_time"`
+		Unfriendly bool `json:"unfriendly"`
+		TitleExpireTime int `json:"title_expire_time"`
+		CardChangeable bool `json:"card_changeable"`
+		Senders
+	}
 
-type Credentials struct {
-	Cookie
-	CsrfToken
-}
-type Image struct {
-	File string `json:"file"`
-}
+	getMsgJson struct {
+		responseJson
+		Data GetMessage `json:"data"`
+	}
 
-type Bool struct {
-	Yes bool `json:"yes"`
-}
+	GetMessage struct {
+		Time        int32        `json:"time"`
+		Group 		bool     	 `json:"group"`
+		MessageId   int32        `json:"message_id"`
+		RealId      int32        `json:"real_id"`
+		Sender      Senders 	 `json:"sender"`
+		Message     string		 `json:"message"`
+	}
 
-type OnlineStatus struct {
-	Online bool `json:"online"`
-	Good bool `json:"good"`
-}
-type defaultResponseJson struct {
-	responseJson
-	Data string `json:"data"`
-}
+	FriendList struct {
+		UserId int `json:"user_id"`
+		NickName string `json:"nick_name"`
+		Remark string `json:"remark"`
+	}
 
-type responseStrangerInfoJson struct {
-	responseJson
-	Data Senders `json:"data"`
-}
-type responseGroupListJson struct {
-	responseJson
-	Data []GroupInfo `json:"data"`
-}
+	GroupInfo struct {
+		GroupId int `json:"group_id"`
+		GroupName string `json:"group_name"`
+		MemberCount int `json:"member_count"`
+		MaxMemberCount int `json:"max_member_count"`
+	}
+
+	GroupHonorInfo struct {
+		GroupId int `json:"group_id"`
+		CurrentTalkative CurrentTalkativeS `json:"current_talkative"`
+		TalkativeList []GroupHonorInfoList `json:"talkative_list"`
+		PerformerList []GroupHonorInfoList `json:"performer_list"`
+		LegendList    []GroupHonorInfoList `json:"legend_list"`
+		StrongNewbieList []GroupHonorInfoList `json:"strong_newbie_list"`
+		EmotionList  []GroupHonorInfoList `json:"emotion_list"`
+	}
+
+	CurrentTalkativeS struct {
+		UserId int `json:"user_id"`
+		NickName string `json:"nick_name"`
+		Avatar string `json:"avatar"`
+		DayCount int `json:"day_count"`
+	}
+
+	GroupHonorInfoList struct {
+		UserId int `json:"user_id"`
+		NickName string `json:"nick_name"`
+		Avatar string `json:"avatar"`
+		Description string `json:"description"`
+	}
+
+	Record struct {
+		File string	`json:"file"`
+		OutFormat string `json:"out_format"`
+	}
+
+	Cookie struct {
+		Cookies string `json:"cookies"`
+	}
+
+	CsrfToken struct {
+		Token string `json:"token"`
+	}
+
+	OnlineStatus struct {
+		Online bool `json:"online"`
+		Good bool `json:"good"`
+	}
+
+	Bool struct {
+		Yes bool `json:"yes"`
+	}
+
+	Image struct {
+		File string `json:"file"`
+	}
+
+	Credentials struct {
+		Cookie
+		CsrfToken
+	}
+
+)
+
+type (
+	defaultResponseJson struct {
+		responseJson
+		Data string `json:"data"`
+	}
+
+	responseGroupListJson struct {
+		responseJson
+		Data []GroupInfo `json:"data"`
+	}
+
+	responseStrangerInfoJson struct {
+		responseJson
+		Data Senders `json:"data"`
+	}
+
+	responseGroupInfoJson struct {
+		responseJson
+		Data GroupInfo `json:"data"`
+	}
+
+	responseFriendListJson struct {
+		responseJson
+		Data []FriendList `json:"data"`
+	}
+
+	responseMessageJson struct {
+		responseJson
+		Data MessageIds `json:"data"`
+	}
+
+	responseLoginIndoJson struct {
+		responseJson
+		Data LoginInfo `json:"data"`
+	}
+
+	responseGroupMemberInfoJson struct {
+		responseJson
+		Data GroupMemberInfo `json:"data"`
+	}
+	responseGroupMemberListJson struct {
+		responseJson
+		Data []GroupMemberInfo `json:"data"`
+	}
+)
+
+
 
 type Api interface {
 	SendMsg(messageType string,id int,message string,autoEscape bool)int32
@@ -247,6 +283,8 @@ var (
 	FriendListJson responseFriendListJson
 	GroupInfoJson responseGroupInfoJson
 	GroupListJson responseGroupListJson
+	GroupMemberInfoJson responseGroupMemberInfoJson
+	GroupMemberListJson responseGroupMemberListJson
 )
 
 func (bot Bots) SendGroupMsg(groupId int,message string,autoEscape bool) int32  {
@@ -602,11 +640,35 @@ func (bot Bots) GetGroupList() []GroupInfo {
 }
 
 func (bot Bots) GetGroupMemberInfo(groupId int, UserId int, noCache bool) GroupMemberInfo {
-	panic("implement me")
+	requestUrl := "http://%s:%d/get_group_member_info?"
+	requestUrl += "group_id=%d"
+	requestUrl += "&user_id=%d"
+	requestUrl += "&no_cache=%v"
+	url := fmt.Sprintf(requestUrl,bot.Address,bot.Port,groupId,UserId,noCache)
+	response, err1 := http.Get(url)
+	if err1 != nil {
+		log.Panicf("上报到%s:%d失败\n", bot.Address, bot.Port)
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &GroupMemberInfoJson)
+	log.Println(url,"\n\t\t\t\t\t",GroupMemberInfoJson.RetCode,GroupMemberInfoJson.Status)
+	return GroupMemberInfoJson.Data
 }
 
 func (bot Bots) GetGroupMemberList(groupId int) []GroupMemberInfo {
-	panic("implement me")
+	requestUrl := "http://%s:%d/get_group_member_list?"
+	requestUrl += "group_id=%d"
+	url := fmt.Sprintf(requestUrl,bot.Address,bot.Port,groupId)
+	response, err1 := http.Get(url)
+	if err1 != nil {
+		log.Panicf("上报到%s:%d失败\n", bot.Address, bot.Port)
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &GroupMemberListJson)
+	log.Println(url,"\n\t\t\t\t\t",GroupMemberListJson.RetCode,GroupMemberListJson.Status)
+	return GroupMemberListJson.Data
 }
 
 func (bot Bots) GetGroupHonorInfo(groupId int, honorType string) GroupHonorInfo {
