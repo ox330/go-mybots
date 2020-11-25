@@ -49,7 +49,7 @@ var Bot = go_mybots.Bots{Address: "127.0.0.1", Port: 5700,Admin: 1743224847}
 
 //将handle函数加入go_mybots的消息路由
 func init(){
-    go_mybots.ViewMessage = append(go_mybots.ViewMessage, handle)
+    go_mybots.ViewMessage = append(go_mybots.ViewMessage, go_mybots.ViewMessageApi{OnMessage: handle})
 }
 
 func main() {
