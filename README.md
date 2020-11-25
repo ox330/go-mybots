@@ -76,4 +76,4 @@ func handle(event go-mybots.events){
 
 具体实现更多的逻辑，可先参考onebot[文档](https://github.com/howmanybots/onebot)。
 
-####有兴趣可加qq3343780376
+##有兴趣可加qq3343780376
