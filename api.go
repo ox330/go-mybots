@@ -348,6 +348,45 @@ type (
 		InvitedRequests []InvitedRequest `json:"invited_requests"` //邀请消息列表
 		JoinRequests    []JoinRequest    `json:"join_requests"`    //进群消息列表
 	}
+	GroupFileSystemInfo struct {
+		FileCount  int `json:"file_count"`  //文件总数
+		LimitCount int `json:"limit_count"` //文件上限
+		UsedSpace  int `json:"used_space"`  //已使用空间
+		TotalSpace int `json:"total_space"` //空间上限
+	}
+	File struct {
+		FileId        string `json:"file_id"`        //文件ID
+		FileName      string `json:"file_name"`      //文件名
+		Busid         int    `json:"busid"`          //文件类型
+		FileSize      int64  `json:"file_size"`      //文件大小
+		UploadTime    int64  `json:"upload_time"`    //上传时间
+		DeadTime      int64  `json:"dead_time"`      //过期时间,永久文件恒为0
+		ModifyTime    int64  `json:"modify_time"`    //最后修改时间
+		DownloadTimes int32  `json:"download_times"` //下载次数
+		Uploader      int64  `json:"uploader"`       //上传者ID
+		UploaderName  string `json:"uploader_name"`  //上传者名字
+	}
+	Folder struct {
+		FolderId       string `json:"folder_id"`        //文件夹ID
+		FolderName     string `json:"folder_name"`      //文件名
+		CreateTime     int    `json:"create_time"`      //创建时间
+		Creator        int    `json:"creator"`          //创建者
+		CreatorName    string `json:"creator_name"`     //创建者名字
+		TotalFileCount int32  `json:"total_file_count"` //子文件数量
+	}
+	GroupRootFiles struct {
+		Files   []File   `json:"files"`
+		Folders []Folder `json:"folders"`
+	}
+	GroupFilesByFolder struct {
+		Files   []File   `json:"files"`
+		Folders []Folder `json:"folders"`
+	}
+	GroupAtAllRemain struct {
+		CanAtAll                 bool `json:"can_at_all"`                    //是否可以@全体成员
+		RemainAtAllCountForGroup int  `json:"remain_at_all_count_for_group"` //群内所有管理当天剩余@全体成员次数
+		RemainAtAllCountForUin   int  `json:"remain_at_all_count_for_uin"`   //BOT当天剩余@全体成员次数
+	}
 )
 
 type specialApi interface {
@@ -359,6 +398,11 @@ type specialApi interface {
 	getWordSlices(content string) []string
 	ocrImage(image string) OcrImage
 	getGroupSystemMsg() GroupSystemMsg
+	getGroupFileSystemInfo(groupId int) GroupFileSystemInfo
+	getGroupRootFiles(groupId int) GroupRootFiles
+	getGroupFilesByFolder(groupId int, folderId string) GroupFilesByFolder
+	getGroupFileUrl(groupId int, fileId string, busid int) string
+	getGroupAtAllRemain(groupId int)
 }
 
 type Api interface {
@@ -984,6 +1028,77 @@ func (bot Bots) GetStatus() OnlineStatus {
 	_ = json.Unmarshal(responseByte, &onlineStatusJson)
 	log.Println(url, "\n\t\t\t\t\t", onlineStatusJson.RetCode, onlineStatusJson.Status)
 	return onlineStatusJson.Data
+}
+
+//go-cqhttp  APi
+
+func (bot Bots) setGroupName(groupId int, groupName string) {
+	url := fmt.Sprintf("http://%s:%d/send_group_name", bot.Address, bot.Port)
+	data := fmt.Sprintf("{\"group_id\":%d,\"group_name\":%v}", groupId, groupName)
+	log.Println(data)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
+	if err != nil {
+		log.Panic("newRequest error")
+	}
+	req.Header.Set("Command-Type", "application/json")
+	client := http.Client{}
+	response, err := client.Do(req)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &responseMsgJson)
+	log.Println(url, data, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+
+}
+
+func (bot Bots) setGroupPortrait(groupId int, file string, cache int) {
+	panic("implement me")
+}
+
+func (bot Bots) getMsg(messageId int) Msg {
+	panic("implement me")
+}
+
+func (bot Bots) getForwardMsg(messageId int) []ForwardMsg {
+	panic("implement me")
+}
+
+func (bot Bots) sendGroupForwardMsg(groupId int, messages []string) {
+	panic("implement me")
+}
+
+func (bot Bots) getWordSlices(content string) []string {
+	panic("implement me")
+}
+
+func (bot Bots) ocrImage(image string) OcrImage {
+	panic("implement me")
+}
+
+func (bot Bots) getGroupSystemMsg() GroupSystemMsg {
+	panic("implement me")
+}
+
+func (bot Bots) getGroupFileSystemInfo(groupId int) GroupFileSystemInfo {
+	panic("implement me")
+}
+
+func (bot Bots) getGroupRootFiles(groupId int) GroupRootFiles {
+	panic("implement me")
+}
+
+func (bot Bots) getGroupFilesByFolder(groupId int, folderId string) GroupFilesByFolder {
+	panic("implement me")
+}
+
+func (bot Bots) getGroupFileUrl(groupId int, fileId string, busid int) string {
+	panic("implement me")
+}
+
+func (bot Bots) getGroupAtAllRemain(groupId int) {
+	panic("implement me")
 }
 
 func (m Message) Append(message string) Message {
