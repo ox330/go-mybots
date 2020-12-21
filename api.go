@@ -303,6 +303,64 @@ type (
 	}
 )
 
+type (
+	Msg struct {
+		MessageId int     `json:"message_id"`
+		RealId    int     `json:"real_id"`
+		Sender    Senders `json:"sender"`
+		Time      int     `json:"time"`
+		Message   string  `json:"message"`
+	}
+	ForwardMsg struct {
+		Content string  `json:"content"`
+		Sender  Senders `json:"sender"`
+		Time    int     `json:"time"`
+	}
+	TextDetection struct {
+		Text        string      `json:"text"`
+		Confidence  int         `json:"confidence"`
+		Coordinates interface{} `json:"coordinates"`
+	}
+	OcrImage struct {
+		Texts    []TextDetection `json:"texts"`
+		Language string          `json:"language"`
+	}
+	InvitedRequest struct {
+		RequestId   int    `json:"request_id"`   //请求ID
+		InvitorUin  int    `json:"invitor_uin"`  //邀请者
+		InvitorNick string `json:"invitor_nick"` //邀请者昵称
+		GroupId     int    `json:"group_id"`     //群号
+		GroupName   string `json:"group_name"`   //群名
+		Checked     bool   `json:"checked"`      //是否已被处理
+		Actor       int64  `json:"actor"`        //处理者, 未处理为0
+	}
+	JoinRequest struct {
+		RequestId     int    `json:"request_id"`     //请求ID
+		RequesterUin  int    `json:"requester_uin"`  //请求者ID
+		RequesterNick string `json:"requester_nick"` //请求者昵称
+		Message       string `json:"message"`        //验证消息
+		GroupId       int    `json:"group_id"`       //群号
+		GroupName     string `json:"group_name"`     //群名
+		Checked       bool   `json:"checked"`        //是否已被处理
+		Actor         int    `json:"actor"`          //处理者, 未处理为0
+	}
+	GroupSystemMsg struct {
+		InvitedRequests []InvitedRequest `json:"invited_requests"` //邀请消息列表
+		JoinRequests    []JoinRequest    `json:"join_requests"`    //进群消息列表
+	}
+)
+
+type specialApi interface {
+	setGroupName(groupId int, groupName string)
+	setGroupPortrait(groupId int, file string, cache int)
+	getMsg(messageId int) Msg
+	getForwardMsg(messageId int) []ForwardMsg
+	sendGroupForwardMsg(groupId int, messages []string)
+	getWordSlices(content string) []string
+	ocrImage(image string) OcrImage
+	getGroupSystemMsg() GroupSystemMsg
+}
+
 type Api interface {
 	SendMsg(messageType string, id int, message string, autoEscape bool) int32
 	SendLike(userId int, times int)
