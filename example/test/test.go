@@ -7,7 +7,7 @@ import (
 var Bot = go_mybots.Bots{Address: "127.0.0.1", Port: 5700, Admin: 1743224847}
 
 func init() {
-	go_mybots.Info = Bot.GetLoginInfo()
+	go_mybots.Info, _ = Bot.GetLoginInfo()
 	go_mybots.ViewOnCoCommand = append(go_mybots.ViewOnCoCommand, go_mybots.ViewOnC0CommandApi{
 		CoCommand: DefaultOnCoCommand, Command: "weather", Allies: "天气", OnToMe: false})
 	go_mybots.ViewMessage = append(go_mybots.ViewMessage, go_mybots.ViewMessageApi{OnMessage: DefaultMessageHandle,
@@ -23,12 +23,13 @@ func init() {
 func DefaultMessageHandle(event go_mybots.Event) {
 	if event.Message == "hello" && event.UserId == Bot.Admin {
 		go Bot.SendPrivateMsg(event.UserId, "hello   world", false)
+
 	}
 }
 
 func MessageTest(event go_mybots.Event) {
 	if event.GroupId == 972264701 {
-		Bot.SendGroupMsg(event.GroupId, event.Message, false)
+		go Bot.SendGroupMsg(event.GroupId, event.Message, false)
 	}
 }
 

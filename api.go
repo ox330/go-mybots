@@ -11,6 +11,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 type Bots struct {
@@ -301,10 +302,18 @@ type (
 		responseJson
 		Data OnlineStatus `json:"data"`
 	}
+	responseMsgDataJson struct {
+		responseJson
+		Data MsgData `json:"data"`
+	}
+	responseForwardMsgJson struct {
+		responseJson
+		Data []ForwardMsg `json:"data"`
+	}
 )
 
 type (
-	Msg struct {
+	MsgData struct {
 		MessageId int     `json:"message_id"`
 		RealId    int     `json:"real_id"`
 		Sender    Senders `json:"sender"`
@@ -390,50 +399,50 @@ type (
 )
 
 type specialApi interface {
-	setGroupName(groupId int, groupName string)
-	setGroupPortrait(groupId int, file string, cache int)
-	getMsg(messageId int) Msg
-	getForwardMsg(messageId int) []ForwardMsg
-	sendGroupForwardMsg(groupId int, messages []string)
-	getWordSlices(content string) []string
-	ocrImage(image string) OcrImage
-	getGroupSystemMsg() GroupSystemMsg
-	getGroupFileSystemInfo(groupId int) GroupFileSystemInfo
-	getGroupRootFiles(groupId int) GroupRootFiles
-	getGroupFilesByFolder(groupId int, folderId string) GroupFilesByFolder
-	getGroupFileUrl(groupId int, fileId string, busid int) string
-	getGroupAtAllRemain(groupId int)
+	setGroupName(groupId int, groupName string) error
+	setGroupPortrait(groupId int, file string, cache int) error
+	getMsg(messageId int) (MsgData, error)
+	getForwardMsg(messageId int) ([]ForwardMsg, error)
+	sendGroupForwardMsg(groupId int, messages []string) error
+	getWordSlices(content string) ([]string, error)
+	ocrImage(image string) (OcrImage, error)
+	getGroupSystemMsg() (GroupSystemMsg, error)
+	getGroupFileSystemInfo(groupId int) (GroupFileSystemInfo, error)
+	getGroupRootFiles(groupId int) (GroupRootFiles, error)
+	getGroupFilesByFolder(groupId int, folderId string) (GroupFilesByFolder, error)
+	getGroupFileUrl(groupId int, fileId string, busid int) (string, error)
+	getGroupAtAllRemain(groupId int) error
 }
 
 type Api interface {
-	SendMsg(messageType string, id int, message string, autoEscape bool) int32
-	SendLike(userId int, times int)
-	SetGroupKick(groupId int, UserId int, rejectAddRequest bool)
-	SetGroupAnonymousBan(groupId int, flag string, duration int)
-	SetGroupWholeBan(groupId int, enable bool)
-	SetGroupAdmin(groupId int, UserId int, enable bool)
-	SetGroupAnonymous(groupId int, enable bool)
-	SetGroupName(groupId int, groupName string)
-	SetGroupLeave(groupId int, isDisMiss bool)
-	SetGroupSpecialTitle(groupId int, userId int, specialTitle string, duration int)
-	SetFriendAddRequest(flag string, approve bool, remark string)
-	SetGroupAddRequest(flag string, subType string, approve bool, reason string)
-	GetLoginInfo() LoginInfo
-	GetStrangerInfo() Senders
-	GetFriendList() []FriendList
-	GetGroupInfo(groupId int, noCache bool) GroupInfo
-	GetGroupList() []GroupInfo
-	GetGroupMemberInfo(groupId int, UserId int, noCache bool) GroupMemberInfo
-	GetGroupMemberList(groupId int) []GroupMemberInfo
-	GetGroupHonorInfo(groupId int, honorType string) GroupHonorInfo
-	GetCookies(domain string) Cookie
-	GetCsrfToken() CsrfToken
-	GetCredentials(domain string) Credentials
-	GetRecord(file, outFormat string) Record
-	GetImage(file string) Image
-	CanSendImage() Bool
-	CanSendRecord() Bool
-	GetStatus() OnlineStatus
+	SendMsg(messageType string, id int, message string, autoEscape bool) (int32, error)
+	SendLike(userId int, times int) error
+	SetGroupKick(groupId int, UserId int, rejectAddRequest bool) error
+	SetGroupAnonymousBan(groupId int, flag string, duration int) error
+	SetGroupWholeBan(groupId int, enable bool) error
+	SetGroupAdmin(groupId int, UserId int, enable bool) error
+	SetGroupAnonymous(groupId int, enable bool) error
+	SetGroupName(groupId int, groupName string) error
+	SetGroupLeave(groupId int, isDisMiss bool) error
+	SetGroupSpecialTitle(groupId int, userId int, specialTitle string, duration int) error
+	SetFriendAddRequest(flag string, approve bool, remark string) error
+	SetGroupAddRequest(flag string, subType string, approve bool, reason string) error
+	GetLoginInfo() (LoginInfo, error)
+	GetStrangerInfo() (Senders, error)
+	GetFriendList() ([]FriendList, error)
+	GetGroupInfo(groupId int, noCache bool) (GroupInfo, error)
+	GetGroupList() ([]GroupInfo, error)
+	GetGroupMemberInfo(groupId int, UserId int, noCache bool) (GroupMemberInfo, error)
+	GetGroupMemberList(groupId int) ([]GroupMemberInfo, error)
+	GetGroupHonorInfo(groupId int, honorType string) (GroupHonorInfo, error)
+	GetCookies(domain string) (Cookie, error)
+	GetCsrfToken() (CsrfToken, error)
+	GetCredentials(domain string) (Credentials, error)
+	GetRecord(file, outFormat string) (Record, error)
+	GetImage(file string) (Image, error)
+	CanSendImage() (Bool, error)
+	CanSendRecord() (Bool, error)
+	GetStatus() (OnlineStatus, error)
 }
 
 var (
@@ -455,9 +464,11 @@ var (
 	imageJson           responseImageJson
 	canSendJson         responseCanSendJson
 	onlineStatusJson    responseOnlineStatus
+	msgJson             responseMsgDataJson
+	forwardMsgJson      responseForwardMsgJson
 )
 
-func (bot Bots) SendGroupMsg(groupId int, message string, autoEscape bool) int32 {
+func (bot Bots) SendGroupMsg(groupId int, message string, autoEscape bool) (int32, error) {
 	url := fmt.Sprintf("http://%s:%d/send_group_msg", bot.Address, bot.Port)
 	data := fmt.Sprintf("{\"group_id\":%d,\"message\":\"%s\",\"auto_escape\":%v}", groupId, message, autoEscape)
 	log.Println(data)
@@ -475,10 +486,10 @@ func (bot Bots) SendGroupMsg(groupId int, message string, autoEscape bool) int32
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &responseMsgJson)
 	log.Println(url, data, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
-	return responseMsgJson.Data.MessageId
+	return responseMsgJson.Data.MessageId, err
 }
 
-func (bot Bots) SendPrivateMsg(userId int, message string, autoEscape bool) int32 {
+func (bot Bots) SendPrivateMsg(userId int, message string, autoEscape bool) (int32, error) {
 	url := fmt.Sprintf("http://%s:%d/send_private_msg", bot.Address, bot.Port)
 	data := fmt.Sprintf("{\"user_id\":%d,\"message\":\"%s\",\"auto_escape\":%v}", userId, message, autoEscape)
 	log.Println(data)
@@ -496,10 +507,10 @@ func (bot Bots) SendPrivateMsg(userId int, message string, autoEscape bool) int3
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &responseMsgJson)
 	log.Println(url, data, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
-	return responseMsgJson.Data.MessageId
+	return responseMsgJson.Data.MessageId, err
 }
 
-func (bot Bots) DeleteMsg(messageId int32) {
+func (bot Bots) DeleteMsg(messageId int32) error {
 	requestUrl := "http://%s:%d/delete_msg?"
 	requestUrl += "message_id=%d"
 	url := fmt.Sprintf(requestUrl, bot.Address, bot.Port, messageId)
@@ -508,9 +519,10 @@ func (bot Bots) DeleteMsg(messageId int32) {
 		log.Panicf("上报到%s:%d失败\n", bot.Address, bot.Port)
 	}
 	defer response.Body.Close()
+	return err1
 }
 
-func (bot Bots) GetMsg(messageId int32) GetMessage {
+func (bot Bots) GetMsg(messageId int32) (GetMessage, error) {
 	requestUrl := "http://%s:%d/get_msg?"
 	requestUrl += "message_id=%d"
 	url := fmt.Sprintf(requestUrl, bot.Address, bot.Port, messageId)
@@ -525,10 +537,10 @@ func (bot Bots) GetMsg(messageId int32) GetMessage {
 	if err != nil {
 		panic(err)
 	}
-	return getMessageJson.Data
+	return getMessageJson.Data, err1
 }
 
-func (bot Bots) SetGroupBan(groupId int, userId int, duration int) {
+func (bot Bots) SetGroupBan(groupId int, userId int, duration int) error {
 	requestUrl := "http://%s:%d/set_group_ban?"
 	requestUrl += "group_id=%d"
 	requestUrl += "&user_id=%d"
@@ -539,9 +551,10 @@ func (bot Bots) SetGroupBan(groupId int, userId int, duration int) {
 		log.Panicf("上报到%s:%d失败\n", bot.Address, bot.Port)
 	}
 	defer response.Body.Close()
+	return err1
 }
 
-func (bot Bots) SetGroupCard(groupId int, userId int, card string) {
+func (bot Bots) SetGroupCard(groupId int, userId int, card string) error {
 	requestUrl := "http://%s:%d/set_group_card?"
 	requestUrl += "group_id=%d"
 	requestUrl += "&user_id=%d"
@@ -555,22 +568,23 @@ func (bot Bots) SetGroupCard(groupId int, userId int, card string) {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
 	log.Println(url, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
-
+	return err1
 }
 
-func (bot Bots) SendMsg(messageType string, id int, message string, autoEscape bool) int32 {
+func (bot Bots) SendMsg(messageType string, id int, message string, autoEscape bool) (int32, error) {
 	var MessageId int32
+	var err error
 	if messageType == "group" {
-		MessageId = bot.SendGroupMsg(id, message, autoEscape)
+		MessageId, err = bot.SendGroupMsg(id, message, autoEscape)
 	} else if messageType == "private" {
-		MessageId = bot.SendPrivateMsg(id, message, autoEscape)
+		MessageId, err = bot.SendPrivateMsg(id, message, autoEscape)
 	} else {
 		log.Println("请正确指定messageType的值")
 	}
-	return MessageId
+	return MessageId, err
 }
 
-func (bot Bots) SendLike(userId int, times int) {
+func (bot Bots) SendLike(userId int, times int) error {
 	requestUrl := "http://%s:%d/send_like?"
 	requestUrl += "user_id=%d"
 	requestUrl += "&times=%d"
@@ -583,9 +597,10 @@ func (bot Bots) SendLike(userId int, times int) {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
 	log.Println(url, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	return err1
 }
 
-func (bot Bots) SetGroupKick(groupId int, UserId int, rejectAddRequest bool) {
+func (bot Bots) SetGroupKick(groupId int, UserId int, rejectAddRequest bool) error {
 	requestUrl := "http://%s:%d/set_group_kick?"
 	requestUrl += "group_id=%d"
 	requestUrl += "&user_id=%d"
@@ -599,9 +614,10 @@ func (bot Bots) SetGroupKick(groupId int, UserId int, rejectAddRequest bool) {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
 	log.Println(url, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	return err1
 }
 
-func (bot Bots) SetGroupAnonymousBan(groupId int, flag string, duration int) {
+func (bot Bots) SetGroupAnonymousBan(groupId int, flag string, duration int) error {
 	requestUrl := "http://%s:%d/set_group_anonymous_ban?"
 	requestUrl += "group_id=%d"
 	requestUrl += "&flag=%s"
@@ -615,9 +631,10 @@ func (bot Bots) SetGroupAnonymousBan(groupId int, flag string, duration int) {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
 	log.Println(url, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	return err1
 }
 
-func (bot Bots) SetGroupWholeBan(groupId int, enable bool) {
+func (bot Bots) SetGroupWholeBan(groupId int, enable bool) error {
 	requestUrl := "http://%s:%d/set_group_whole_ban?"
 	requestUrl += "group_id=%d"
 	requestUrl += "&enable=%s"
@@ -630,9 +647,10 @@ func (bot Bots) SetGroupWholeBan(groupId int, enable bool) {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
 	log.Println(url, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	return err1
 }
 
-func (bot Bots) SetGroupAdmin(groupId int, UserId int, enable bool) {
+func (bot Bots) SetGroupAdmin(groupId int, UserId int, enable bool) error {
 	requestUrl := "http://%s:%d/set_group_admin?"
 	requestUrl += "group_id=%d"
 	requestUrl += "&user_id=%d"
@@ -646,9 +664,10 @@ func (bot Bots) SetGroupAdmin(groupId int, UserId int, enable bool) {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
 	log.Println(url, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	return err1
 }
 
-func (bot Bots) SetGroupAnonymous(groupId int, enable bool) {
+func (bot Bots) SetGroupAnonymous(groupId int, enable bool) error {
 	requestUrl := "http://%s:%d/set_group_anonymous?"
 	requestUrl += "group_id=%d"
 	requestUrl += "&enable=%s"
@@ -661,9 +680,10 @@ func (bot Bots) SetGroupAnonymous(groupId int, enable bool) {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
 	log.Println(url, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	return err1
 }
 
-func (bot Bots) SetGroupName(groupId int, groupName string) {
+func (bot Bots) SetGroupName(groupId int, groupName string) error {
 	requestUrl := "http://%s:%d/set_group_name?"
 	requestUrl += "group_id=%d"
 	requestUrl += "&group_name=%s"
@@ -676,9 +696,10 @@ func (bot Bots) SetGroupName(groupId int, groupName string) {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
 	log.Println(url, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	return err1
 }
 
-func (bot Bots) SetGroupLeave(groupId int, isDisMiss bool) {
+func (bot Bots) SetGroupLeave(groupId int, isDisMiss bool) error {
 	requestUrl := "http://%s:%d/set_group_leave?"
 	requestUrl += "group_id=%d"
 	requestUrl += "&is_dis_miss=%s"
@@ -691,9 +712,10 @@ func (bot Bots) SetGroupLeave(groupId int, isDisMiss bool) {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
 	log.Println(url, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	return err1
 }
 
-func (bot Bots) SetGroupSpecialTitle(groupId int, userId int, specialTitle string, duration int) {
+func (bot Bots) SetGroupSpecialTitle(groupId int, userId int, specialTitle string, duration int) error {
 	requestUrl := "http://%s:%d/set_group_special_title?"
 	requestUrl += "group_id=%d"
 	requestUrl += "&user_id=%d"
@@ -708,9 +730,10 @@ func (bot Bots) SetGroupSpecialTitle(groupId int, userId int, specialTitle strin
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
 	log.Println(url, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	return err1
 }
 
-func (bot Bots) SetFriendAddRequest(flag string, approve bool, remark string) {
+func (bot Bots) SetFriendAddRequest(flag string, approve bool, remark string) error {
 	requestUrl := "http://%s:%d/set_friend_add_request?"
 	requestUrl += "flag=%s"
 	requestUrl += "&approve=%s"
@@ -724,9 +747,10 @@ func (bot Bots) SetFriendAddRequest(flag string, approve bool, remark string) {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
 	log.Println(url, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	return err1
 }
 
-func (bot Bots) SetGroupAddRequest(flag string, subType string, approve bool, reason string) {
+func (bot Bots) SetGroupAddRequest(flag string, subType string, approve bool, reason string) error {
 	requestUrl := "http://%s:%d/set_group_add_request?"
 	requestUrl += "flag=%s"
 	requestUrl += "&sub_type=%s"
@@ -741,9 +765,10 @@ func (bot Bots) SetGroupAddRequest(flag string, subType string, approve bool, re
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
 	log.Println(url, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	return err1
 }
 
-func (bot Bots) GetLoginInfo() LoginInfo {
+func (bot Bots) GetLoginInfo() (LoginInfo, error) {
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -761,10 +786,10 @@ func (bot Bots) GetLoginInfo() LoginInfo {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &LoginInfoJson)
 	log.Println(url, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
-	return LoginInfoJson.Data
+	return LoginInfoJson.Data, err1
 }
 
-func (bot Bots) GetStrangerInfo() Senders {
+func (bot Bots) GetStrangerInfo() (Senders, error) {
 	requestUrl := "http://%s:%d/get_stranger_info"
 	url := fmt.Sprintf(requestUrl, bot.Address, bot.Port)
 	response, err1 := http.Get(url)
@@ -775,10 +800,10 @@ func (bot Bots) GetStrangerInfo() Senders {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &StrangerInfo)
 	log.Println(url, "\n\t\t\t\t\t", StrangerInfo.RetCode, StrangerInfo.Status)
-	return StrangerInfo.Data
+	return StrangerInfo.Data, err1
 }
 
-func (bot Bots) GetFriendList() []FriendList {
+func (bot Bots) GetFriendList() ([]FriendList, error) {
 	requestUrl := "http://%s:%d/get_friend_list"
 	url := fmt.Sprintf(requestUrl, bot.Address, bot.Port)
 	response, err1 := http.Get(url)
@@ -789,10 +814,10 @@ func (bot Bots) GetFriendList() []FriendList {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &FriendListJson)
 	log.Println(url, "\n\t\t\t\t\t", FriendListJson.RetCode, FriendListJson.Status)
-	return FriendListJson.Data
+	return FriendListJson.Data, err1
 }
 
-func (bot Bots) GetGroupInfo(groupId int, noCache bool) GroupInfo {
+func (bot Bots) GetGroupInfo(groupId int, noCache bool) (GroupInfo, error) {
 	requestUrl := "http://%s:%d/get_group_info?"
 	requestUrl += "group_id=%d"
 	requestUrl += "no_cache=%s"
@@ -805,10 +830,10 @@ func (bot Bots) GetGroupInfo(groupId int, noCache bool) GroupInfo {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &GroupInfoJson)
 	log.Println(url, "\n\t\t\t\t\t", GroupInfoJson.RetCode, GroupInfoJson.Status)
-	return GroupInfoJson.Data
+	return GroupInfoJson.Data, err1
 }
 
-func (bot Bots) GetGroupList() []GroupInfo {
+func (bot Bots) GetGroupList() ([]GroupInfo, error) {
 	requestUrl := "http://%s:%d/get_group_list"
 	url := fmt.Sprintf(requestUrl, bot.Address, bot.Port)
 	response, err1 := http.Get(url)
@@ -819,10 +844,10 @@ func (bot Bots) GetGroupList() []GroupInfo {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &GroupListJson)
 	log.Println(url, "\n\t\t\t\t\t", GroupListJson.RetCode, GroupListJson.Status)
-	return GroupListJson.Data
+	return GroupListJson.Data, err1
 }
 
-func (bot Bots) GetGroupMemberInfo(groupId int, UserId int, noCache bool) GroupMemberInfo {
+func (bot Bots) GetGroupMemberInfo(groupId int, UserId int, noCache bool) (GroupMemberInfo, error) {
 	requestUrl := "http://%s:%d/get_group_member_info?"
 	requestUrl += "group_id=%d"
 	requestUrl += "&user_id=%d"
@@ -836,10 +861,10 @@ func (bot Bots) GetGroupMemberInfo(groupId int, UserId int, noCache bool) GroupM
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &GroupMemberInfoJson)
 	log.Println(url, "\n\t\t\t\t\t", GroupMemberInfoJson.RetCode, GroupMemberInfoJson.Status)
-	return GroupMemberInfoJson.Data
+	return GroupMemberInfoJson.Data, err1
 }
 
-func (bot Bots) GetGroupMemberList(groupId int) []GroupMemberInfo {
+func (bot Bots) GetGroupMemberList(groupId int) ([]GroupMemberInfo, error) {
 	requestUrl := "http://%s:%d/get_group_member_list?"
 	requestUrl += "group_id=%d"
 	url := fmt.Sprintf(requestUrl, bot.Address, bot.Port, groupId)
@@ -851,10 +876,10 @@ func (bot Bots) GetGroupMemberList(groupId int) []GroupMemberInfo {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &GroupMemberListJson)
 	log.Println(url, "\n\t\t\t\t\t", GroupMemberListJson.RetCode, GroupMemberListJson.Status)
-	return GroupMemberListJson.Data
+	return GroupMemberListJson.Data, err1
 }
 
-func (bot Bots) GetGroupHonorInfo(groupId int, honorType string) GroupHonorInfo {
+func (bot Bots) GetGroupHonorInfo(groupId int, honorType string) (GroupHonorInfo, error) {
 	url := fmt.Sprintf("http://%s:%d/get_group_honor_info", bot.Address, bot.Port)
 	data := fmt.Sprintf("{\"group_id\":%d,\"honor_type\":%v}", groupId, honorType)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
@@ -871,10 +896,10 @@ func (bot Bots) GetGroupHonorInfo(groupId int, honorType string) GroupHonorInfo 
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &GroupHonorInfoJson)
 	log.Println(url, data, "\n\t\t\t\t\t", GroupHonorInfoJson.RetCode, GroupHonorInfoJson.Status)
-	return GroupHonorInfoJson.Data
+	return GroupHonorInfoJson.Data, err
 }
 
-func (bot Bots) GetCookies(domain string) Cookie {
+func (bot Bots) GetCookies(domain string) (Cookie, error) {
 	url := fmt.Sprintf("http://%s:%d/get_cookies", bot.Address, bot.Port)
 	data := fmt.Sprintf("{\"domain\":%v}", domain)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
@@ -891,10 +916,10 @@ func (bot Bots) GetCookies(domain string) Cookie {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &CookiesJson)
 	log.Println(url, data, "\n\t\t\t\t\t", CookiesJson.RetCode, CookiesJson.Status)
-	return CookiesJson.Data
+	return CookiesJson.Data, err
 }
 
-func (bot Bots) GetCsrfToken() CsrfToken {
+func (bot Bots) GetCsrfToken() (CsrfToken, error) {
 	url := fmt.Sprintf("http://%s:%d/get_csrf_token", bot.Address, bot.Port)
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
@@ -910,10 +935,10 @@ func (bot Bots) GetCsrfToken() CsrfToken {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &csrfTokenJson)
 	log.Println(url, "\n\t\t\t\t\t", csrfTokenJson.RetCode, csrfTokenJson.Status)
-	return csrfTokenJson.Data
+	return csrfTokenJson.Data, err
 }
 
-func (bot Bots) GetCredentials(domain string) Credentials {
+func (bot Bots) GetCredentials(domain string) (Credentials, error) {
 	url := fmt.Sprintf("http://%s:%d/get_credentials", bot.Address, bot.Port)
 	data := fmt.Sprintf("{\"domain\":%v}", domain)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
@@ -930,10 +955,10 @@ func (bot Bots) GetCredentials(domain string) Credentials {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &credentialsJson)
 	log.Println(url, data, "\n\t\t\t\t\t", credentialsJson.RetCode, credentialsJson.Status)
-	return credentialsJson.Data
+	return credentialsJson.Data, err
 }
 
-func (bot Bots) GetRecord(file, outFormat string) Record {
+func (bot Bots) GetRecord(file, outFormat string) (Record, error) {
 	url := fmt.Sprintf("http://%s:%d/get_record", bot.Address, bot.Port)
 	data := fmt.Sprintf("{\"file\":%v\"out_format\":%v}", file, outFormat)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
@@ -950,10 +975,10 @@ func (bot Bots) GetRecord(file, outFormat string) Record {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &recordJson)
 	log.Println(url, data, "\n\t\t\t\t\t", recordJson.RetCode, recordJson.Status)
-	return recordJson.Data
+	return recordJson.Data, err
 }
 
-func (bot Bots) GetImage(file string) Image {
+func (bot Bots) GetImage(file string) (Image, error) {
 	url := fmt.Sprintf("http://%s:%d/get_image", bot.Address, bot.Port)
 	data := fmt.Sprintf("{\"file\":%v}", file)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
@@ -970,10 +995,10 @@ func (bot Bots) GetImage(file string) Image {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &imageJson)
 	log.Println(url, data, "\n\t\t\t\t\t", imageJson.RetCode, imageJson.Status)
-	return imageJson.Data
+	return imageJson.Data, err
 }
 
-func (bot Bots) CanSendImage() Bool {
+func (bot Bots) CanSendImage() (Bool, error) {
 	url := fmt.Sprintf("http://%s:%d/can_send_image", bot.Address, bot.Port)
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
@@ -989,10 +1014,10 @@ func (bot Bots) CanSendImage() Bool {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &canSendJson)
 	log.Println(url, "\n\t\t\t\t\t", canSendJson.RetCode, canSendJson.Status)
-	return canSendJson.Data
+	return canSendJson.Data, err
 }
 
-func (bot Bots) CanSendRecord() Bool {
+func (bot Bots) CanSendRecord() (Bool, error) {
 	url := fmt.Sprintf("http://%s:%d/can_send_record", bot.Address, bot.Port)
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
@@ -1008,10 +1033,10 @@ func (bot Bots) CanSendRecord() Bool {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &canSendJson)
 	log.Println(url, "\n\t\t\t\t\t", canSendJson.RetCode, canSendJson.Status)
-	return canSendJson.Data
+	return canSendJson.Data, err
 }
 
-func (bot Bots) GetStatus() OnlineStatus {
+func (bot Bots) GetStatus() (OnlineStatus, error) {
 	url := fmt.Sprintf("http://%s:%d/can_send_image", bot.Address, bot.Port)
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
@@ -1027,12 +1052,12 @@ func (bot Bots) GetStatus() OnlineStatus {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &onlineStatusJson)
 	log.Println(url, "\n\t\t\t\t\t", onlineStatusJson.RetCode, onlineStatusJson.Status)
-	return onlineStatusJson.Data
+	return onlineStatusJson.Data, err
 }
 
 //go-cqhttp  APi
 
-func (bot Bots) setGroupName(groupId int, groupName string) {
+func (bot Bots) setGroupName(groupId int, groupName string) error {
 	url := fmt.Sprintf("http://%s:%d/send_group_name", bot.Address, bot.Port)
 	data := fmt.Sprintf("{\"group_id\":%d,\"group_name\":%v}", groupId, groupName)
 	log.Println(data)
@@ -1050,54 +1075,103 @@ func (bot Bots) setGroupName(groupId int, groupName string) {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &responseMsgJson)
 	log.Println(url, data, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
-
+	return err
 }
 
-func (bot Bots) setGroupPortrait(groupId int, file string, cache int) {
+func (bot Bots) setGroupPortrait(groupId int, file string, cache int) error {
+	url := fmt.Sprintf("http://%s:%d/send_group_portrait", bot.Address, bot.Port)
+	data := fmt.Sprintf("{\"group_id\":%d,\"file\":%v,\"cache\":%v}", groupId, file, cache)
+	log.Println(data)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
+	if err != nil {
+		log.Panic("newRequest error")
+	}
+	req.Header.Set("Command-Type", "application/json")
+	client := http.Client{}
+	response, err := client.Do(req)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &responseMsgJson)
+	log.Println(url, data, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	return err
+}
+
+func (bot Bots) getMsg(messageId int) (MsgData, error) {
+	url := fmt.Sprintf("http://%s:%d/get_msg", bot.Address, bot.Port)
+	data := fmt.Sprintf("{\"message_id\":%d}", messageId)
+	req, err := http.NewRequest("POST", url, strings.NewReader(data))
+	if err != nil {
+		log.Panic("newRequest error")
+	}
+	req.Header.Set("Command-Type", "application/json")
+	client := http.Client{}
+	response, err := client.Do(req)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &msgJson)
+	log.Println(url, "\n\t\t\t\t\t", msgJson.RetCode, msgJson.Status)
+	return msgJson.Data, err
+}
+
+func (bot Bots) getForwardMsg(messageId int) ([]ForwardMsg, error) {
+	url := fmt.Sprintf("http://%s:%d/get_forward_msg", bot.Address, bot.Port)
+	data := fmt.Sprintf("{\"message_id\":%d}", messageId)
+	req, err := http.NewRequest("POST", url, strings.NewReader(data))
+	if err != nil {
+		log.Panic("newRequest error")
+	}
+	req.Header.Set("Command-Type", "application/json")
+	client := http.Client{}
+	response, err := client.Do(req)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &forwardMsgJson)
+	log.Println(url, "\n\t\t\t\t\t", forwardMsgJson.RetCode, forwardMsgJson.Status)
+	return forwardMsgJson.Data, err
+}
+
+func (bot Bots) sendGroupForwardMsg(groupId int, messages []string) error {
 	panic("implement me")
 }
 
-func (bot Bots) getMsg(messageId int) Msg {
+func (bot Bots) getWordSlices(content string) ([]string, error) {
 	panic("implement me")
 }
 
-func (bot Bots) getForwardMsg(messageId int) []ForwardMsg {
+func (bot Bots) ocrImage(image string) (OcrImage, error) {
 	panic("implement me")
 }
 
-func (bot Bots) sendGroupForwardMsg(groupId int, messages []string) {
+func (bot Bots) getGroupSystemMsg() (GroupSystemMsg, error) {
 	panic("implement me")
 }
 
-func (bot Bots) getWordSlices(content string) []string {
+func (bot Bots) getGroupFileSystemInfo(groupId int) (GroupFileSystemInfo, error) {
 	panic("implement me")
 }
 
-func (bot Bots) ocrImage(image string) OcrImage {
+func (bot Bots) getGroupRootFiles(groupId int) (GroupRootFiles, error) {
 	panic("implement me")
 }
 
-func (bot Bots) getGroupSystemMsg() GroupSystemMsg {
+func (bot Bots) getGroupFilesByFolder(groupId int, folderId string) (GroupFilesByFolder, error) {
 	panic("implement me")
 }
 
-func (bot Bots) getGroupFileSystemInfo(groupId int) GroupFileSystemInfo {
+func (bot Bots) getGroupFileUrl(groupId int, fileId string, busid int) (string, error) {
 	panic("implement me")
 }
 
-func (bot Bots) getGroupRootFiles(groupId int) GroupRootFiles {
-	panic("implement me")
-}
-
-func (bot Bots) getGroupFilesByFolder(groupId int, folderId string) GroupFilesByFolder {
-	panic("implement me")
-}
-
-func (bot Bots) getGroupFileUrl(groupId int, fileId string, busid int) string {
-	panic("implement me")
-}
-
-func (bot Bots) getGroupAtAllRemain(groupId int) {
+func (bot Bots) getGroupAtAllRemain(groupId int) error {
 	panic("implement me")
 }
 
