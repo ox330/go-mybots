@@ -88,7 +88,7 @@ func processMessageHandle(event Event) {
 			v.SubType = event.SubType
 		}
 		if v.MessageType == "" {
-			v.MessageType = event.NoticeType
+			v.MessageType = event.MessageType
 		}
 		if (v.MessageType == event.MessageType) && (v.SubType == event.SubType) {
 			go v.OnMessage(event)

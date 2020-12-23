@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	url2 "net/url"
 	"os"
 	"regexp"
 	"strconv"
@@ -470,18 +471,23 @@ var (
 
 func (bot Bots) SendGroupMsg(groupId int, message string, autoEscape bool) (int32, error) {
 	url := fmt.Sprintf("http://%s:%d/send_group_msg", bot.Address, bot.Port)
-	data := fmt.Sprintf("{\"group_id\":%d,\"message\":\"%s\",\"auto_escape\":%v}", groupId, message, autoEscape)
+	data := fmt.Sprintf("{\"group_id\":%d,\"message\":\"%v\",\"auto_escape\":%v}", groupId, message, autoEscape)
 	log.Println(data)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
+	values := url2.Values{}
+	values.Add("group_id", strconv.Itoa(groupId))
+	values.Add("message", message)
+	values.Add("auto_escape", fmt.Sprintf("%v", autoEscape))
+	response, err := http.PostForm(url, values)
 	if err != nil {
 		log.Panic("newRequest error")
 	}
-	req.Header.Set("Command-Type", "application/json")
-	client := http.Client{}
-	response, err := client.Do(req)
-	if err != nil {
-		log.Panic("client error")
-	}
+	//req.Header.Set("Command-Type", "application/json")
+	//client := http.Client{}
+	//response, err := client.Do(req)
+	//if err != nil {
+	//	log.Panic("client error")
+	//}
+	log.Println(url + values.Encode())
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &responseMsgJson)
@@ -491,22 +497,27 @@ func (bot Bots) SendGroupMsg(groupId int, message string, autoEscape bool) (int3
 
 func (bot Bots) SendPrivateMsg(userId int, message string, autoEscape bool) (int32, error) {
 	url := fmt.Sprintf("http://%s:%d/send_private_msg", bot.Address, bot.Port)
-	data := fmt.Sprintf("{\"user_id\":%d,\"message\":\"%s\",\"auto_escape\":%v}", userId, message, autoEscape)
-	log.Println(data)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
+	//data := fmt.Sprintf("{\"user_id\":%d,\"message\":\"%s\",\"auto_escape\":%v}", userId, message, autoEscape)
+	values := url2.Values{}
+	values.Add("user_id", strconv.Itoa(userId))
+	values.Add("message", message)
+	values.Add("auto_escape", fmt.Sprintf("%v", autoEscape))
+	//log.Println(data)
+	response, err := http.PostForm(url, values)
 	if err != nil {
 		log.Panic("newRequest error")
 	}
-	req.Header.Set("Command-Type", "application/json")
-	client := http.Client{}
-	response, err := client.Do(req)
-	if err != nil {
-		log.Panic("client error")
-	}
+	//req.Header.Set("Command-Type", "application/json")
+	//client := http.Client{}
+	//response, err := client.Do(req)
+	//if err != nil {
+	//	log.Panic("client error")
+	//}
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &responseMsgJson)
-	log.Println(url, data, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	//log.Println(url, data, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	log.Println(responseMsgJson.Status, url, values.Encode())
 	return responseMsgJson.Data.MessageId, err
 }
 
