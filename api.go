@@ -2,7 +2,6 @@ package go_mybots
 
 import "C"
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -12,7 +11,6 @@ import (
 	"os"
 	"regexp"
 	"strconv"
-	"strings"
 )
 
 type Bots struct {
@@ -902,7 +900,7 @@ func (bot Bots) GetGroupHonorInfo(groupId int, honorType string) (GroupHonorInfo
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &GroupHonorInfoJson)
-	log.Println(url, values, "\n\t\t\t\t\t", GroupHonorInfoJson.RetCode, GroupHonorInfoJson.Status)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", GroupHonorInfoJson.RetCode, GroupHonorInfoJson.Status)
 	return GroupHonorInfoJson.Data, err
 }
 
@@ -917,7 +915,7 @@ func (bot Bots) GetCookies(domain string) (Cookie, error) {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &CookiesJson)
-	log.Println(url, values, "\n\t\t\t\t\t", CookiesJson.RetCode, CookiesJson.Status)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", CookiesJson.RetCode, CookiesJson.Status)
 	return CookiesJson.Data, err
 }
 
@@ -945,7 +943,7 @@ func (bot Bots) GetCredentials(domain string) (Credentials, error) {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &credentialsJson)
-	log.Println(url, domain, "\n\t\t\t\t\t", credentialsJson.RetCode, credentialsJson.Status)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", credentialsJson.RetCode, credentialsJson.Status)
 	return credentialsJson.Data, err
 }
 
@@ -961,7 +959,7 @@ func (bot Bots) GetRecord(file, outFormat string) (Record, error) {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &recordJson)
-	log.Println(url, values, "\n\t\t\t\t\t", recordJson.RetCode, recordJson.Status)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", recordJson.RetCode, recordJson.Status)
 	return recordJson.Data, err
 }
 
@@ -976,7 +974,7 @@ func (bot Bots) GetImage(file string) (Image, error) {
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &imageJson)
-	log.Println(url, values, "\n\t\t\t\t\t", imageJson.RetCode, imageJson.Status)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", imageJson.RetCode, imageJson.Status)
 	return imageJson.Data, err
 }
 
@@ -1009,13 +1007,7 @@ func (bot Bots) CanSendRecord() (Bool, error) {
 
 func (bot Bots) GetStatus() (OnlineStatus, error) {
 	url := fmt.Sprintf("http://%s:%d/can_send_image", bot.Address, bot.Port)
-	req, err := http.NewRequest("POST", url, nil)
-	if err != nil {
-		log.Panic("newRequest error")
-	}
-	req.Header.Set("Command-Type", "application/json")
-	client := http.Client{}
-	response, err := client.Do(req)
+	response, err := http.Get(url)
 	if err != nil {
 		log.Panic("client error")
 	}
@@ -1030,83 +1022,64 @@ func (bot Bots) GetStatus() (OnlineStatus, error) {
 
 func (bot Bots) setGroupName(groupId int, groupName string) error {
 	url := fmt.Sprintf("http://%s:%d/send_group_name", bot.Address, bot.Port)
-	data := fmt.Sprintf("{\"group_id\":%d,\"group_name\":%v}", groupId, groupName)
-	log.Println(data)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
-	if err != nil {
-		log.Panic("newRequest error")
-	}
-	req.Header.Set("Command-Type", "application/json")
-	client := http.Client{}
-	response, err := client.Do(req)
+	values := url2.Values{}
+	values.Add("group_id", strconv.Itoa(groupId))
+	values.Add("group_name", groupName)
+	response, err := http.PostForm(url, values)
 	if err != nil {
 		log.Panic("client error")
 	}
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &responseMsgJson)
-	log.Println(url, data, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 	return err
 }
 
 func (bot Bots) setGroupPortrait(groupId int, file string, cache int) error {
 	url := fmt.Sprintf("http://%s:%d/send_group_portrait", bot.Address, bot.Port)
-	data := fmt.Sprintf("{\"group_id\":%d,\"file\":%v,\"cache\":%v}", groupId, file, cache)
-	log.Println(data)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
-	if err != nil {
-		log.Panic("newRequest error")
-	}
-	req.Header.Set("Command-Type", "application/json")
-	client := http.Client{}
-	response, err := client.Do(req)
+	values := url2.Values{}
+	values.Add("group_id", strconv.Itoa(groupId))
+	values.Add("file", file)
+	values.Add("cache", strconv.Itoa(cache))
+	response, err := http.PostForm(url, values)
 	if err != nil {
 		log.Panic("client error")
 	}
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &responseMsgJson)
-	log.Println(url, data, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 	return err
 }
 
 func (bot Bots) getMsg(messageId int) (MsgData, error) {
 	url := fmt.Sprintf("http://%s:%d/get_msg", bot.Address, bot.Port)
-	data := fmt.Sprintf("{\"message_id\":%d}", messageId)
-	req, err := http.NewRequest("POST", url, strings.NewReader(data))
-	if err != nil {
-		log.Panic("newRequest error")
-	}
-	req.Header.Set("Command-Type", "application/json")
-	client := http.Client{}
-	response, err := client.Do(req)
+	values := url2.Values{}
+	values.Add("message_id", strconv.Itoa(messageId))
+	response, err := http.PostForm(url, values)
 	if err != nil {
 		log.Panic("client error")
 	}
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &msgJson)
-	log.Println(url, "\n\t\t\t\t\t", msgJson.RetCode, msgJson.Status)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", msgJson.RetCode, msgJson.Status)
 	return msgJson.Data, err
 }
 
 func (bot Bots) getForwardMsg(messageId int) ([]ForwardMsg, error) {
 	url := fmt.Sprintf("http://%s:%d/get_forward_msg", bot.Address, bot.Port)
-	data := fmt.Sprintf("{\"message_id\":%d}", messageId)
-	req, err := http.NewRequest("POST", url, strings.NewReader(data))
-	if err != nil {
-		log.Panic("newRequest error")
-	}
-	req.Header.Set("Command-Type", "application/json")
-	client := http.Client{}
-	response, err := client.Do(req)
+	values := url2.Values{}
+	values.Add("message_id", strconv.Itoa(messageId))
+	response, err := http.PostForm(url, values)
 	if err != nil {
 		log.Panic("client error")
 	}
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &forwardMsgJson)
-	log.Println(url, "\n\t\t\t\t\t", forwardMsgJson.RetCode, forwardMsgJson.Status)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", forwardMsgJson.RetCode, forwardMsgJson.Status)
 	return forwardMsgJson.Data, err
 }
 
