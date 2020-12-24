@@ -892,53 +892,38 @@ func (bot Bots) GetGroupMemberList(groupId int) ([]GroupMemberInfo, error) {
 
 func (bot Bots) GetGroupHonorInfo(groupId int, honorType string) (GroupHonorInfo, error) {
 	url := fmt.Sprintf("http://%s:%d/get_group_honor_info", bot.Address, bot.Port)
-	data := fmt.Sprintf("{\"group_id\":%d,\"honor_type\":%v}", groupId, honorType)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
-	if err != nil {
-		log.Panic("newRequest error")
-	}
-	req.Header.Set("Command-Type", "application/json")
-	client := http.Client{}
-	response, err := client.Do(req)
+	values := url2.Values{}
+	values.Add("group_id", strconv.Itoa(groupId))
+	values.Add("honor_type", honorType)
+	response, err := http.PostForm(url, values)
 	if err != nil {
 		log.Panic("client error")
 	}
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &GroupHonorInfoJson)
-	log.Println(url, data, "\n\t\t\t\t\t", GroupHonorInfoJson.RetCode, GroupHonorInfoJson.Status)
+	log.Println(url, values, "\n\t\t\t\t\t", GroupHonorInfoJson.RetCode, GroupHonorInfoJson.Status)
 	return GroupHonorInfoJson.Data, err
 }
 
 func (bot Bots) GetCookies(domain string) (Cookie, error) {
 	url := fmt.Sprintf("http://%s:%d/get_cookies", bot.Address, bot.Port)
-	data := fmt.Sprintf("{\"domain\":%v}", domain)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
-	if err != nil {
-		log.Panic("newRequest error")
-	}
-	req.Header.Set("Command-Type", "application/json")
-	client := http.Client{}
-	response, err := client.Do(req)
+	values := url2.Values{}
+	values.Add("domain", domain)
+	response, err := http.PostForm(url, values)
 	if err != nil {
 		log.Panic("client error")
 	}
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &CookiesJson)
-	log.Println(url, data, "\n\t\t\t\t\t", CookiesJson.RetCode, CookiesJson.Status)
+	log.Println(url, values, "\n\t\t\t\t\t", CookiesJson.RetCode, CookiesJson.Status)
 	return CookiesJson.Data, err
 }
 
 func (bot Bots) GetCsrfToken() (CsrfToken, error) {
 	url := fmt.Sprintf("http://%s:%d/get_csrf_token", bot.Address, bot.Port)
-	req, err := http.NewRequest("POST", url, nil)
-	if err != nil {
-		log.Panic("newRequest error")
-	}
-	req.Header.Set("Command-Type", "application/json")
-	client := http.Client{}
-	response, err := client.Do(req)
+	response, err := http.Get(url)
 	if err != nil {
 		log.Panic("client error")
 	}
@@ -951,73 +936,54 @@ func (bot Bots) GetCsrfToken() (CsrfToken, error) {
 
 func (bot Bots) GetCredentials(domain string) (Credentials, error) {
 	url := fmt.Sprintf("http://%s:%d/get_credentials", bot.Address, bot.Port)
-	data := fmt.Sprintf("{\"domain\":%v}", domain)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
-	if err != nil {
-		log.Panic("newRequest error")
-	}
-	req.Header.Set("Command-Type", "application/json")
-	client := http.Client{}
-	response, err := client.Do(req)
+	values := url2.Values{}
+	values.Add("domain", domain)
+	response, err := http.PostForm(url, values)
 	if err != nil {
 		log.Panic("client error")
 	}
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &credentialsJson)
-	log.Println(url, data, "\n\t\t\t\t\t", credentialsJson.RetCode, credentialsJson.Status)
+	log.Println(url, domain, "\n\t\t\t\t\t", credentialsJson.RetCode, credentialsJson.Status)
 	return credentialsJson.Data, err
 }
 
 func (bot Bots) GetRecord(file, outFormat string) (Record, error) {
 	url := fmt.Sprintf("http://%s:%d/get_record", bot.Address, bot.Port)
-	data := fmt.Sprintf("{\"file\":%v\"out_format\":%v}", file, outFormat)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
-	if err != nil {
-		log.Panic("newRequest error")
-	}
-	req.Header.Set("Command-Type", "application/json")
-	client := http.Client{}
-	response, err := client.Do(req)
+	values := url2.Values{}
+	values.Add("file", file)
+	values.Add("out_format", outFormat)
+	response, err := http.PostForm(url, values)
 	if err != nil {
 		log.Panic("client error")
 	}
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &recordJson)
-	log.Println(url, data, "\n\t\t\t\t\t", recordJson.RetCode, recordJson.Status)
+	log.Println(url, values, "\n\t\t\t\t\t", recordJson.RetCode, recordJson.Status)
 	return recordJson.Data, err
 }
 
 func (bot Bots) GetImage(file string) (Image, error) {
 	url := fmt.Sprintf("http://%s:%d/get_image", bot.Address, bot.Port)
-	data := fmt.Sprintf("{\"file\":%v}", file)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
-	if err != nil {
-		log.Panic("newRequest error")
-	}
-	req.Header.Set("Command-Type", "application/json")
-	client := http.Client{}
-	response, err := client.Do(req)
+	values := url2.Values{}
+	values.Add("file", file)
+	response, err := http.PostForm(url, values)
 	if err != nil {
 		log.Panic("client error")
 	}
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &imageJson)
-	log.Println(url, data, "\n\t\t\t\t\t", imageJson.RetCode, imageJson.Status)
+	log.Println(url, values, "\n\t\t\t\t\t", imageJson.RetCode, imageJson.Status)
 	return imageJson.Data, err
 }
 
 func (bot Bots) CanSendImage() (Bool, error) {
 	url := fmt.Sprintf("http://%s:%d/can_send_image", bot.Address, bot.Port)
-	req, err := http.NewRequest("POST", url, nil)
-	if err != nil {
-		log.Panic("newRequest error")
-	}
-	req.Header.Set("Command-Type", "application/json")
-	client := http.Client{}
-	response, err := client.Do(req)
+
+	response, err := http.Get(url)
 	if err != nil {
 		log.Panic("client error")
 	}
@@ -1030,13 +996,7 @@ func (bot Bots) CanSendImage() (Bool, error) {
 
 func (bot Bots) CanSendRecord() (Bool, error) {
 	url := fmt.Sprintf("http://%s:%d/can_send_record", bot.Address, bot.Port)
-	req, err := http.NewRequest("POST", url, nil)
-	if err != nil {
-		log.Panic("newRequest error")
-	}
-	req.Header.Set("Command-Type", "application/json")
-	client := http.Client{}
-	response, err := client.Do(req)
+	response, err := http.Get(url)
 	if err != nil {
 		log.Panic("client error")
 	}
