@@ -48,13 +48,6 @@ var (
 	MessageTypeApi = ConstMessageType{Group: "group", Private: "private"}
 )
 
-type MessageAction interface {
-	Append(message string) Message
-	MessageImage(path string) Message
-	MessageAt(UserId int) Message
-	Image() []string
-}
-
 type MessageIds struct {
 	MessageId int32 `json:"message_id"`
 }
@@ -1119,19 +1112,15 @@ func (bot Bots) getGroupAtAllRemain(groupId int) error {
 	panic("implement me")
 }
 
-func (m Message) Append(message string) Message {
-	return Message{m.Message + message}
-}
-
-func (m Message) MessageImage(path string) Message {
+func MessageImage(path string) Message {
 	return Message{fmt.Sprintf("[CQ:image.file=file:/%s]", path)}
 }
 
-func (m Message) MessageAt(UserId int) Message {
+func MessageAt(UserId int) Message {
 	return Message{fmt.Sprintf("[CQ:at:qq=%d]", UserId)}
 }
 
-func (m Message) Image() []string {
+func MatchImage(m Message) []string {
 	reg := regexp.MustCompile(`[CQ:image,file=.]`)
 	if reg == nil {
 		log.Panic("regexp error")
