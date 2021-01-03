@@ -49,7 +49,8 @@ var Bot = go_mybots.Bots{Address: "127.0.0.1", Port: 5700,Admin: 1743224847}
 
 //将handle函数加入go_mybots的消息路由
 func init(){
-    go_mybots.ViewMessage = append(go_mybots.ViewMessage, go_mybots.ViewMessageApi{OnMessage: handle})
+    o_mybots.ViewMessage = append(go_mybots.ViewMessage, go_mybots.ViewMessageApi{OnMessage: hand,
+    		MessageType: go_mybots.MessageTypeApi.Group, SubType: ""})
 }
 
 func main() {
@@ -64,7 +65,7 @@ func main() {
 func handle(event go-mybots.events){
     //判断消息为hello且发送消息的账号为测试账号
     if event.Message=="hello"&&event.UserId== Bot.Admin {
-            //异步调用SendGroupMsg这个api,三个参数分别为，发送的对象qq号，消息内容和是否解析cq码
+            //异步调用SendPrivateMsg这个api,三个参数分别为，发送的对象qq号，消息内容和是否解析cq码
     		go Bot.SendPrivateMsg(event.UserId,"hello,world",false)
     	}
 }
@@ -76,4 +77,3 @@ func handle(event go-mybots.events){
 
 具体实现更多的逻辑，可先参考onebot[文档](https://github.com/howmanybots/onebot)。
 
-##有兴趣可加qq3343780376
