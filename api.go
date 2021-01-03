@@ -1115,7 +1115,7 @@ func MessageImage(path string) Message {
 }
 
 func MessageAt(UserId int) Message {
-	return Message{fmt.Sprintf("[CQ:at:qq=%d]", UserId)}
+	return Message{fmt.Sprintf("[CQ:at,qq=%d]", UserId)}
 }
 
 func MatchImage(m Message) []string {

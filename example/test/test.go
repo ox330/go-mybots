@@ -24,7 +24,8 @@ func init() {
 
 func DefaultMessageHandle(event go_mybots.Event) {
 	log.Println("收到了私聊信息")
-	go Bot.SendPrivateMsg(event.UserId, "hello   world", false)
+	message := go_mybots.MessageAt(event.UserId).Message
+	go Bot.SendPrivateMsg(event.UserId, "hello   world"+message, false)
 
 }
 
