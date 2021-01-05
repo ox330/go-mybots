@@ -16,7 +16,14 @@ var (
 	ViewMeta        []func(event Event)
 	ViewOnCoCommand []ViewOnC0CommandApi
 	Info            LoginInfo
+	c               = make(chan Event, 20)
+	nextEvent       bool
 )
+
+type Rule struct {
+	fun  func(event Event, a ...interface{}) bool
+	args []interface{}
+}
 
 type (
 	ViewMessageApi struct {
@@ -25,10 +32,10 @@ type (
 		SubType     string
 	}
 	ViewOnC0CommandApi struct {
-		CoCommand func(event Event, args []string)
-		Command   string
-		Allies    string
-		OnToMe    bool
+		CoCommand   func(event Event, args []string)
+		Command     string
+		Allies      string
+		RuleChecked []Rule
 	}
 	ViewOnNotice struct {
 		OnNotice   func(event Event)
@@ -38,20 +45,32 @@ type (
 )
 
 func init() {
-
+	nextEvent = false
 }
 
-func EventMain(body io.Reader) {
+func eventMain(body io.Reader) {
 	var event Event
 	form, _ := ioutil.ReadAll(body)
 	_ = json.Unmarshal(form, &event)
 	viewsMessage(event)
 }
 
+func GetNextEvent() Event {
+	defer func() {
+		nextEvent = false
+	}()
+	nextEvent = true
+	event := <-c
+	return event
+}
+
 func viewsMessage(event Event) {
 	switch event.PostType {
 	case "message":
-		processMessageHandle(event)
+		c <- event
+		if !nextEvent {
+			go processMessageHandle()
+		}
 	case "notice":
 		processNoticeHandle(event)
 	case "request":
@@ -69,18 +88,30 @@ func viewsMessage(event Event) {
 	}
 }
 
-func processMessageHandle(event Event) {
+//执行checkRule切片里所以类型为func(event Event,v []interface)bool 类型的方法
+func checkRule(event Event, RuleChecked []Rule) bool {
+	for _, rule := range RuleChecked {
+		e := rule.fun(event, rule.args)
+		if !e {
+			return false
+		}
+	}
+	return true
+}
+
+func processMessageHandle() {
+	event := <-c
 	for _, v := range ViewOnCoCommand {
-		onlyToMe := strings.Contains(event.Message, fmt.Sprintf("[CQ:at,qq=%d]", Info.UserId))
 		content := strings.HasPrefix(event.Message, v.Command)
 		allies := strings.HasPrefix(event.Message, v.Allies)
-		if v.OnToMe == onlyToMe && (content || allies) {
-			go v.CoCommand(event, strings.Fields(event.Message))
+		if checkRule(event, v.RuleChecked) && (content || allies) {
+			v.CoCommand(event, strings.Fields(event.Message))
 			log.Printf("message_type:%s\n\t\t\t\t\tgroup_id:%d\n\t\t\t\t\tuser_id:%d\n\t\t\t\t\tmessage:%s",
 				event.MessageType, event.GroupId, event.UserId, event.Message)
 			return
 		}
 	}
+
 	log.Printf("message_type:%s\n\t\t\t\t\tgroup_id:%d\n\t\t\t\t\tuser_id:%d\n\t\t\t\t\tmessage:%s",
 		event.MessageType, event.GroupId, event.UserId, event.Message)
 	for _, v := range ViewMessage {
@@ -114,7 +145,13 @@ func processNoticeHandle(event Event) {
 }
 
 func OnlyToMe(event Event) bool {
-	return strings.Contains(event.Message, fmt.Sprintf("[CQ:at,qq=%d]", Info.UserId))
+	if event.MessageType == "group" {
+		return strings.Contains(event.Message, fmt.Sprintf("[CQ:at,qq=%d]", Info.UserId))
+	} else if event.MessageType == "private" {
+		return true
+	} else {
+		return true
+	}
 }
 
 func StartWith(event Event, s string) bool {

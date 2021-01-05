@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"github.com/3343780376/go-mybots"
 	"log"
 )
@@ -10,7 +11,7 @@ var Bot = go_mybots.Bots{Address: "127.0.0.1", Port: 5700, Admin: 1743224847}
 func init() {
 	go_mybots.Info, _ = Bot.GetLoginInfo()
 	go_mybots.ViewOnCoCommand = append(go_mybots.ViewOnCoCommand, go_mybots.ViewOnC0CommandApi{
-		CoCommand: DefaultOnCoCommand, Command: "weather", Allies: "天气", OnToMe: false})
+		CoCommand: DefaultOnCoCommand, Command: "weather", Allies: "天气", RuleChecked: []go_mybots.Rule{}})
 	go_mybots.ViewMessage = append(go_mybots.ViewMessage, go_mybots.ViewMessageApi{OnMessage: DefaultMessageHandle,
 		MessageType: go_mybots.MessageTypeApi.Private, SubType: ""})
 	go_mybots.ViewMessage = append(go_mybots.ViewMessage, go_mybots.ViewMessageApi{OnMessage: MessageTest,
@@ -49,5 +50,7 @@ func DefaultMetaHandle(event go_mybots.Event) {
 }
 
 func DefaultOnCoCommand(event go_mybots.Event, args []string) {
-
+	log.Println("触发了天气命令")
+	nextEvent := go_mybots.GetNextEvent()
+	fmt.Println(nextEvent.Message)
 }
