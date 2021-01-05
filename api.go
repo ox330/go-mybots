@@ -1,3 +1,4 @@
+//api.go文件包含了可以调用的各个api
 package go_mybots
 
 import "C"
@@ -45,6 +46,7 @@ var (
 	NoticeTypeApi = ConstNoticeType{GroupUpload: "group_upload", GroupAdmin: "group_admin", GroupDecrease: "group_decrease",
 		GroupIncrease: "group_increase", GroupBan: "group_ban", FriendAdd: "friend_add",
 		GroupRecall: "group_recall", FriendRecall: "friend_recall", Notify: "notify"}
+
 	MessageTypeApi = ConstMessageType{Group: "group", Private: "private"}
 )
 

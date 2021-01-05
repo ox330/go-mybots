@@ -16,7 +16,7 @@ func init() {
 		MessageType: go_mybots.MessageTypeApi.Private, SubType: ""})
 	go_mybots.ViewMessage = append(go_mybots.ViewMessage, go_mybots.ViewMessageApi{OnMessage: MessageTest,
 		MessageType: go_mybots.MessageTypeApi.Group, SubType: ""})
-	go_mybots.ViewNotice = append(go_mybots.ViewNotice, go_mybots.ViewOnNotice{OnNotice: DefaultNoticeHandle,
+	go_mybots.ViewNotice = append(go_mybots.ViewNotice, go_mybots.ViewOnNoticeApi{OnNotice: DefaultNoticeHandle,
 		NoticeType: go_mybots.NoticeTypeApi.GroupIncrease,
 		SubType:    "approve"})
 	go_mybots.ViewRequest = append(go_mybots.ViewRequest, DefaultRequestHandle)
