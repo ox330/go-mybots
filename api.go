@@ -390,7 +390,7 @@ type (
 	}
 )
 
-type specialApi interface {
+type SpecialApi interface {
 	setGroupName(groupId int, groupName string) error
 	setGroupPortrait(groupId int, file string, cache int) error
 	getMsg(messageId int) (MsgData, error)
@@ -435,6 +435,8 @@ type Api interface {
 	CanSendImage() (Bool, error)
 	CanSendRecord() (Bool, error)
 	GetStatus() (OnlineStatus, error)
+	SetRestart(delay int)
+	CleanCache()
 }
 
 var (
@@ -1007,6 +1009,29 @@ func (bot Bots) GetStatus() (OnlineStatus, error) {
 	_ = json.Unmarshal(responseByte, &onlineStatusJson)
 	log.Println(url, "\n\t\t\t\t\t", onlineStatusJson.RetCode, onlineStatusJson.Status)
 	return onlineStatusJson.Data, err
+}
+
+func (bot Bots) SetRestart(delay int) {
+	url := fmt.Sprintf("http://%s:%d/set_restart", bot.Address, bot.Port)
+	values := url2.Values{}
+	values.Add("delay", strconv.Itoa(delay))
+	response, err := http.PostForm(url, values)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &defaultJson)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+}
+
+func (bot Bots) CleanCache() {
+	url := fmt.Sprintf("http://%s:%d/can_send_image", bot.Address, bot.Port)
+	_, err := http.Get(url)
+	if err != nil {
+		log.Panic("client error")
+	}
+	log.Println("已发送清理缓存请求")
 }
 
 //go-cqhttp  APi

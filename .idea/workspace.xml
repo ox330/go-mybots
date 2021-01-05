@@ -21,7 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="a7e19fda-7b40-45ad-9160-10a6baaa0746" name="默认更改列表" comment="commit">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/test/test.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/test/test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/api.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -181,11 +181,11 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="270" y="57" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1608719744331" />
-    <state x="361" y="145" key="Vcs.Push.Dialog.v2" timestamp="1609642612271">
+    <state x="361" y="145" key="Vcs.Push.Dialog.v2" timestamp="1609666631832">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="338" y="151" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1608603072518" />
-    <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1609642612271" />
+    <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1609666631832" />
     <state x="548" y="198" key="com.goide.refactor.move.GoMoveDeclarationDialog" timestamp="1606117325772">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
