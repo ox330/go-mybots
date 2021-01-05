@@ -128,7 +128,8 @@ func processMessageHandle() {
 		content := strings.HasPrefix(event.Message, v.Command)
 		allies := strings.HasPrefix(event.Message, v.Allies)
 		if checkRule(event, v.RuleChecked) && (content || allies) {
-			v.CoCommand(event, strings.Fields(event.Message))
+			args := strings.Split(event.Message, " ")
+			v.CoCommand(event, args)
 			log.Printf("message_type:%s\n\t\t\t\t\tgroup_id:%d\n\t\t\t\t\tuser_id:%d\n\t\t\t\t\tmessage:%s",
 				event.MessageType, event.GroupId, event.UserId, event.Message)
 			return
