@@ -51,6 +51,7 @@ func DefaultMetaHandle(event go_mybots.Event) {
 
 func DefaultOnCoCommand(event go_mybots.Event, args []string) {
 	log.Println("触发了天气命令")
-	nextEvent := go_mybots.GetNextEvent()
+	_, _ = Bot.SendMsg(event.MessageType, event.GroupId, "请输入你要查询的城市", false)
+	nextEvent := Bot.GetNextEvent(10, event.UserId)
 	fmt.Println(nextEvent.Message)
 }

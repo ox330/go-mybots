@@ -9,6 +9,19 @@ import (
 	"strings"
 )
 
+type Reflect interface {
+	GetNextEvent(int, int) Event
+}
+
+type RuleCheck struct {
+}
+
+type RuleCheckIn interface {
+	OnlyToMe(event Event) bool
+	StartWith(event Event, s string) bool
+	EndWith(event Event, s string) bool
+}
+
 var (
 	ViewMessage     []ViewMessageApi
 	ViewNotice      []ViewOnNotice
@@ -55,13 +68,23 @@ func eventMain(body io.Reader) {
 	viewsMessage(event)
 }
 
-func GetNextEvent() Event {
+func (bot Bots) GetNextEvent(n, UserId int) Event {
 	defer func() {
 		nextEvent = false
 	}()
+
 	nextEvent = true
-	event := <-c
-	return event
+	for i := 0; i < n; i++ {
+		event := <-c
+		if event.UserId != UserId {
+			c <- event
+			go processMessageHandle()
+		} else {
+			return event
+		}
+	}
+
+	return Event{}
 }
 
 func viewsMessage(event Event) {
@@ -144,7 +167,7 @@ func processNoticeHandle(event Event) {
 	}
 }
 
-func OnlyToMe(event Event) bool {
+func (rule RuleCheck) OnlyToMe(event Event) bool {
 	if event.MessageType == "group" {
 		return strings.Contains(event.Message, fmt.Sprintf("[CQ:at,qq=%d]", Info.UserId))
 	} else if event.MessageType == "private" {
@@ -154,10 +177,10 @@ func OnlyToMe(event Event) bool {
 	}
 }
 
-func StartWith(event Event, s string) bool {
+func (rule RuleCheck) StartWith(event Event, s string) bool {
 	return strings.HasPrefix(event.Message, s)
 }
 
-func EndWith(event Event, s string) bool {
+func (rule RuleCheck) EndWith(event Event, s string) bool {
 	return strings.HasSuffix(event.Message, s)
 }
