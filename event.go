@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 )
 
@@ -14,8 +15,27 @@ type Reflect interface {
 	GetNextEvent(int, int) Event
 }
 
-type RuleCheck struct {
-}
+type (
+	RuleCheck struct {
+	}
+	//Rule结构体两个成员分别为RuleCheck类型的函数和需要传递的参数
+	Rule struct {
+		fun  func(event Event, a ...interface{}) bool
+		args []interface{}
+	}
+	Filter struct {
+		Group   FilterGroup `json:"group"`
+		Private []FilterNum `json:"private"`
+	}
+	FilterGroup struct {
+		UserId  []FilterNum `json:"userId"`
+		GroupId []FilterNum `json:"groupId"`
+	}
+
+	FilterNum struct {
+		Num int `json:"num"`
+	}
+)
 
 //RuleCheckIn为RuleCheck结构体的实现
 type RuleCheckIn interface {
@@ -25,6 +45,7 @@ type RuleCheckIn interface {
 }
 
 var (
+	Fil             = Filter{}
 	ViewMessage     []ViewMessageApi       //ViewMessage为一个需要上报到各个Message事件的切片
 	ViewNotice      []ViewOnNoticeApi      //ViewNotice为一个需要上报到各个Notice事件的切片
 	ViewRequest     []func(event Event)    //ViewRequest为一个需要上报到各个Request事件的切片
@@ -34,12 +55,6 @@ var (
 	c               = make(chan Event, 20) //c是一个event类型的通道
 	nextEvent       bool                   //nextEvent是一个决定是否将消息下发的全局变量，当调用GetNextEvent时，该全局变量的值才会发生改变
 )
-
-//Rule结构体两个成员分别为RuleCheck类型的函数和需要传递的参数
-type Rule struct {
-	fun  func(event Event, a ...interface{}) bool
-	args []interface{}
-}
 
 type (
 	//ViewMessageApi结构体为一个Message消息上报位置，包含了具体的方法和需要传递的Message的MessageType和SubType
@@ -63,9 +78,30 @@ type (
 	}
 )
 
-//init函数中对全局变量nextEvent进行了初始化
+//init函数中对全局变量nextEvent进行了初始化并加载filter
 func init() {
 	nextEvent = false
+}
+
+//根据filter进行过滤event
+func checkFilter(event Event) bool {
+
+	for _, groupId := range Fil.Group.GroupId {
+		if groupId.Num == event.GroupId {
+			return false
+		}
+	}
+	for _, privateId := range Fil.Private {
+		if privateId.Num == event.UserId {
+			return false
+		}
+	}
+	for _, groupUserId := range Fil.Group.UserId {
+		if groupUserId.Num == event.UserId {
+			return false
+		}
+	}
+	return true
 }
 
 //eventMain方法对由http传递过来的body进行json格式化，转化为Event事件
@@ -73,7 +109,30 @@ func eventMain(body io.Reader) {
 	var event Event
 	form, _ := ioutil.ReadAll(body)
 	_ = json.Unmarshal(form, &event)
-	viewsMessage(event)
+	if checkFilter(event) {
+		viewsMessage(event)
+	}
+
+}
+
+//加载过滤配置文件
+
+func LoadFilter(path string) Filter {
+	defer func() {
+		err := recover()
+		if err != nil {
+			log.Println("未能加载config.json")
+		}
+	}()
+	file, err := os.Open(path)
+	if err != nil {
+		panic(err)
+	}
+	err = json.NewDecoder(file).Decode(&Fil)
+	if err != nil {
+		panic(err)
+	}
+	return Fil
 }
 
 /*GetNextEvent方法

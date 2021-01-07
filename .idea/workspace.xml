@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="BranchesTreeState">
     <expand>
       <path>
@@ -20,7 +23,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a7e19fda-7b40-45ad-9160-10a6baaa0746" name="默认更改列表" comment="commit">
+      <change afterPath="$PROJECT_DIR$/example/config.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/api.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event.go" beforeDir="false" afterPath="$PROJECT_DIR$/event.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,6 +38,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Go File" />
+        <option value="package.json" />
       </list>
     </option>
   </component>
@@ -42,11 +50,15 @@
     <option name="indexEntireGoPath" value="false" />
   </component>
   <component name="ProjectId" id="1kT3AZ9j2bekga9Qyg39766xXOe" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="添加" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="GO_FMT" value="true" />
@@ -61,6 +73,7 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
     <property name="settings.editor.selected.configurable" value="org.jetbrains.plugins.github.ui.GithubSettingsConfigurable" />
   </component>
@@ -75,6 +88,24 @@
     </key>
   </component>
   <component name="RunManager" selected="Go Build.go build main.go (1)">
+    <configuration name="go build api.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="gononebot" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <filePath value="$PROJECT_DIR$/api.go" />
+      <package value="github.com/3343780376/go-mybots" />
+      <directory value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build event.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="gononebot" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <filePath value="$PROJECT_DIR$/event.go" />
+      <package value="github.com/3343780376/go-mybots" />
+      <directory value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
     <configuration name="go build main.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="gononebot" />
       <working_directory value="$PROJECT_DIR$" />
@@ -96,6 +127,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Go Build.go build main.go (1)" />
+        <item itemvalue="Go Build.go build event.go" />
+        <item itemvalue="Go Build.go build api.go" />
         <item itemvalue="Go Build.go build main.go" />
       </list>
     </recent_temporary>
@@ -117,6 +150,7 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Delete 新建文本文档.txt" />
     <MESSAGE value="新增构建go-cqhttp文档的api" />
     <MESSAGE value="a" />
@@ -129,6 +163,10 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
+    <state x="361" y="71" key="#JSON_Schema_Mappings" timestamp="1609986676124">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="361" y="71" key="#JSON_Schema_Mappings/0.0.1536.824@0.0.1536.824" timestamp="1609986676124" />
     <state x="498" y="235" key="#Notifications" timestamp="1608522418699">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -141,25 +179,25 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="549" y="153" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1606311385824" />
-    <state width="1493" height="207" key="GridCell.Tab.0.bottom" timestamp="1609824999239">
+    <state width="1493" height="198" key="GridCell.Tab.0.bottom" timestamp="1609990462829">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="207" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1609824999239" />
+    <state width="1493" height="198" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1609990462829" />
     <state width="1557" height="294" key="GridCell.Tab.0.bottom/0.0.1600.860@0.0.1600.860" timestamp="1605942015353" />
-    <state width="1493" height="207" key="GridCell.Tab.0.center" timestamp="1609824999239">
+    <state width="1493" height="198" key="GridCell.Tab.0.center" timestamp="1609990462828">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="207" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1609824999239" />
+    <state width="1493" height="198" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1609990462828" />
     <state width="1557" height="294" key="GridCell.Tab.0.center/0.0.1600.860@0.0.1600.860" timestamp="1605942015353" />
-    <state width="1493" height="207" key="GridCell.Tab.0.left" timestamp="1609824999239">
+    <state width="1493" height="198" key="GridCell.Tab.0.left" timestamp="1609990462828">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="207" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1609824999239" />
+    <state width="1493" height="198" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1609990462828" />
     <state width="1557" height="294" key="GridCell.Tab.0.left/0.0.1600.860@0.0.1600.860" timestamp="1605942015353" />
-    <state width="1493" height="207" key="GridCell.Tab.0.right" timestamp="1609824999239">
+    <state width="1493" height="198" key="GridCell.Tab.0.right" timestamp="1609990462828">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="207" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1609824999239" />
+    <state width="1493" height="198" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1609990462828" />
     <state width="1557" height="294" key="GridCell.Tab.0.right/0.0.1600.860@0.0.1600.860" timestamp="1605942015353" />
     <state width="1493" height="261" key="GridCell.Tab.1.bottom" timestamp="1608738976581">
       <screen x="0" y="0" width="1536" height="824" />
@@ -181,11 +219,11 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="270" y="57" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1608719744331" />
-    <state x="361" y="145" key="Vcs.Push.Dialog.v2" timestamp="1609825703946">
+    <state x="361" y="145" key="Vcs.Push.Dialog.v2" timestamp="1609827714410">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="338" y="151" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1608603072518" />
-    <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1609825703946" />
+    <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1609827714410" />
     <state x="543" y="94" key="com.goide.refactor.extractInterface.GoExtractInterfaceDialog" timestamp="1609810499477">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -198,5 +236,9 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="858" y="163" key="refactoring.ChangeSignatureDialog/0.0.1536.824@0.0.1536.824" timestamp="1606187533878" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1609826954326">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1609826954326" />
   </component>
 </project>

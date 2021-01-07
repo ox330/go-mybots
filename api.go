@@ -1,7 +1,6 @@
 //api.go文件包含了可以调用的各个api
 package go_mybots
 
-import "C"
 import (
 	"encoding/json"
 	"fmt"
