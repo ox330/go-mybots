@@ -217,6 +217,16 @@ type (
 		Cookie
 		CsrfToken
 	}
+	Content struct {
+		Type string `json:"type"`
+		Data string `json:"data"`
+	}
+	Node struct {
+		Id      int     `json:"id"`
+		Name    string  `json:"name"`
+		Uin     int     `json:"uin"`
+		Content Content `json:"content"`
+	}
 )
 
 type (
@@ -303,9 +313,44 @@ type (
 		responseJson
 		Data []ForwardMsg `json:"data"`
 	}
+	responseWordSliceJson struct {
+		responseJson
+		Data []string `json:"data"`
+	}
+	responseOcrImageJson struct {
+		responseJson
+		Data OcrImage `json:"data"`
+	}
+	responseGroupSystemMsgJson struct {
+		responseJson
+		Data GroupSystemMsg `json:"data"`
+	}
+	responseGroupFileSystemInfoJson struct {
+		responseJson
+		Data GroupFileSystemInfo `json:"data"`
+	}
+	responseGroupRootFilesJson struct {
+		responseJson
+		Data GroupRootFiles `json:"data"`
+	}
+	responseGroupFilesByFolderJson struct {
+		responseJson
+		Data GroupFilesByFolder `json:"data"`
+	}
+	responseGroupFileUrlJson struct {
+		responseJson
+		Data fileUrl `json:"data"`
+	}
+	responseGroupAtAllRemainJson struct {
+		responseJson
+		Data GroupAtAllRemain `json:"data"`
+	}
 )
 
 type (
+	fileUrl struct {
+		Url string `json:"url"`
+	}
 	MsgData struct {
 		MessageId int     `json:"message_id"`
 		RealId    int     `json:"real_id"`
@@ -396,15 +441,15 @@ type SpecialApi interface {
 	setGroupPortrait(groupId int, file string, cache int) error
 	getMsg(messageId int) (MsgData, error)
 	getForwardMsg(messageId int) ([]ForwardMsg, error)
-	sendGroupForwardMsg(groupId int, messages []string) error
+	sendGroupForwardMsg(groupId int, messages []Node) error
 	getWordSlices(content string) ([]string, error)
 	ocrImage(image string) (OcrImage, error)
 	getGroupSystemMsg() (GroupSystemMsg, error)
 	getGroupFileSystemInfo(groupId int) (GroupFileSystemInfo, error)
 	getGroupRootFiles(groupId int) (GroupRootFiles, error)
 	getGroupFilesByFolder(groupId int, folderId string) (GroupFilesByFolder, error)
-	getGroupFileUrl(groupId int, fileId string, busid int) (string, error)
-	getGroupAtAllRemain(groupId int) error
+	getGroupFileUrl(groupId int, fileId string, busid int) (fileUrl, error)
+	getGroupAtAllRemain(groupId int) (GroupAtAllRemain, error)
 }
 
 type Api interface {
@@ -441,26 +486,34 @@ type Api interface {
 }
 
 var (
-	responseMsgJson     responseMessageJson
-	getMessageJson      getMsgJson
-	defaultJson         defaultResponseJson
-	LoginInfoJson       responseLoginIndoJson
-	StrangerInfo        responseStrangerInfoJson
-	FriendListJson      responseFriendListJson
-	GroupInfoJson       responseGroupInfoJson
-	GroupListJson       responseGroupListJson
-	GroupMemberInfoJson responseGroupMemberInfoJson
-	GroupMemberListJson responseGroupMemberListJson
-	GroupHonorInfoJson  responseGroupHonorInfoJson
-	CookiesJson         responseCookiesJson
-	csrfTokenJson       responseCsrfTokenJson
-	credentialsJson     responseCredentialsJson
-	recordJson          responseRecordJson
-	imageJson           responseImageJson
-	canSendJson         responseCanSendJson
-	onlineStatusJson    responseOnlineStatus
-	msgJson             responseMsgDataJson
-	forwardMsgJson      responseForwardMsgJson
+	responseMsgJson         responseMessageJson
+	getMessageJson          getMsgJson
+	defaultJson             defaultResponseJson
+	LoginInfoJson           responseLoginIndoJson
+	StrangerInfo            responseStrangerInfoJson
+	FriendListJson          responseFriendListJson
+	GroupInfoJson           responseGroupInfoJson
+	GroupListJson           responseGroupListJson
+	GroupMemberInfoJson     responseGroupMemberInfoJson
+	GroupMemberListJson     responseGroupMemberListJson
+	GroupHonorInfoJson      responseGroupHonorInfoJson
+	CookiesJson             responseCookiesJson
+	csrfTokenJson           responseCsrfTokenJson
+	credentialsJson         responseCredentialsJson
+	recordJson              responseRecordJson
+	imageJson               responseImageJson
+	canSendJson             responseCanSendJson
+	onlineStatusJson        responseOnlineStatus
+	msgJson                 responseMsgDataJson
+	forwardMsgJson          responseForwardMsgJson
+	wordSliceJson           responseWordSliceJson
+	ocrImageJson            responseOcrImageJson
+	groupSystemMsgJson      responseGroupSystemMsgJson
+	groupFileSystemInfoJson responseGroupFileSystemInfoJson
+	groupRootFilesJson      responseGroupRootFilesJson
+	groupFilesByFolderJson  responseGroupFilesByFolderJson
+	groupFileUrlJson        responseGroupFileUrlJson
+	groupAtAllRemainJson    responseGroupAtAllRemainJson
 )
 
 func (bot Bots) SendGroupMsg(groupId int, message string, autoEscape bool) (int32, error) {
@@ -1100,42 +1153,145 @@ func (bot Bots) getForwardMsg(messageId int) ([]ForwardMsg, error) {
 	return forwardMsgJson.Data, err
 }
 
-func (bot Bots) sendGroupForwardMsg(groupId int, messages []string) error {
-	panic("implement me")
+func (bot Bots) sendGroupForwardMsg(groupId int, messages []Node) error {
+	url := fmt.Sprintf("http://%s:%d/send_group_forward_msg", bot.Address, bot.Port)
+	values := url2.Values{}
+	values.Add("group_id", strconv.Itoa(groupId))
+	values.Add("messages", fmt.Sprintf("%v", messages))
+	response, err := http.PostForm(url, values)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &defaultJson)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	return err
 }
 
 func (bot Bots) getWordSlices(content string) ([]string, error) {
-	panic("implement me")
+	url := fmt.Sprintf("http://%s:%d/.get_word_slices", bot.Address, bot.Port)
+	values := url2.Values{}
+	values.Add("content", content)
+	response, err := http.PostForm(url, values)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &wordSliceJson)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", wordSliceJson.RetCode, wordSliceJson.Status)
+	return wordSliceJson.Data, err
 }
 
 func (bot Bots) ocrImage(image string) (OcrImage, error) {
-	panic("implement me")
+	url := fmt.Sprintf("http://%s:%d/.ocr_image", bot.Address, bot.Port)
+	values := url2.Values{}
+	values.Add("image", image)
+	response, err := http.PostForm(url, values)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &ocrImageJson)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", ocrImageJson.RetCode, ocrImageJson.Status)
+	return ocrImageJson.Data, err
 }
 
 func (bot Bots) getGroupSystemMsg() (GroupSystemMsg, error) {
-	panic("implement me")
+	url := fmt.Sprintf("http://%s:%d/get_group_system_msg", bot.Address, bot.Port)
+	values := url2.Values{}
+	response, err := http.PostForm(url, values)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &groupSystemMsgJson)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", groupSystemMsgJson.RetCode, groupSystemMsgJson.Status)
+	return groupSystemMsgJson.Data, err
 }
 
 func (bot Bots) getGroupFileSystemInfo(groupId int) (GroupFileSystemInfo, error) {
-	panic("implement me")
+	url := fmt.Sprintf("http://%s:%d/get_group_file_system_info", bot.Address, bot.Port)
+	values := url2.Values{}
+	values.Add("group_id", strconv.Itoa(groupId))
+	response, err := http.PostForm(url, values)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &groupFileSystemInfoJson)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", groupFileSystemInfoJson.RetCode, groupFileSystemInfoJson.Status)
+	return groupFileSystemInfoJson.Data, err
 }
 
 func (bot Bots) getGroupRootFiles(groupId int) (GroupRootFiles, error) {
-	panic("implement me")
+	url := fmt.Sprintf("http://%s:%d/get_group_root_files", bot.Address, bot.Port)
+	values := url2.Values{}
+	values.Add("group_id", strconv.Itoa(groupId))
+	response, err := http.PostForm(url, values)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &groupRootFilesJson)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", groupRootFilesJson.RetCode, groupRootFilesJson.Status)
+	return groupRootFilesJson.Data, err
 }
 
 func (bot Bots) getGroupFilesByFolder(groupId int, folderId string) (GroupFilesByFolder, error) {
-	panic("implement me")
+	url := fmt.Sprintf("http://%s:%d/get_group_files_by_folder", bot.Address, bot.Port)
+	values := url2.Values{}
+	values.Add("group_id", strconv.Itoa(groupId))
+	values.Add("folder_id", folderId)
+	response, err := http.PostForm(url, values)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &groupFilesByFolderJson)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", groupFilesByFolderJson.RetCode, groupFilesByFolderJson.Status)
+	return groupFilesByFolderJson.Data, err
 }
 
-func (bot Bots) getGroupFileUrl(groupId int, fileId string, busid int) (string, error) {
-	panic("implement me")
+func (bot Bots) getGroupFileUrl(groupId int, fileId string, busid int) (fileUrl, error) {
+	url := fmt.Sprintf("http://%s:%d/get_group_file_url", bot.Address, bot.Port)
+	values := url2.Values{}
+	values.Add("group_id", strconv.Itoa(groupId))
+	values.Add("file_id", fileId)
+	values.Add("busid", strconv.Itoa(busid))
+	response, err := http.PostForm(url, values)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &groupFileUrlJson)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", groupFileUrlJson.RetCode, groupFileUrlJson.Status)
+	return groupFileUrlJson.Data, err
 }
 
-func (bot Bots) getGroupAtAllRemain(groupId int) error {
-	panic("implement me")
+func (bot Bots) getGroupAtAllRemain(groupId int) (GroupAtAllRemain, error) {
+	url := fmt.Sprintf("http://%s:%d/get_group_at_all_remain", bot.Address, bot.Port)
+	values := url2.Values{}
+	values.Add("group_id", strconv.Itoa(groupId))
+	response, err := http.PostForm(url, values)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &groupAtAllRemainJson)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", groupAtAllRemainJson.RetCode, groupAtAllRemainJson.Status)
+	return groupAtAllRemainJson.Data, err
 }
 
+//MessageImage
 func MessageImage(path string) Message {
 	return Message{fmt.Sprintf("[CQ:image.file=file:/%s]", path)}
 }
@@ -1144,6 +1300,7 @@ func MessageAt(UserId int) Message {
 	return Message{fmt.Sprintf("[CQ:at,qq=%d]", UserId)}
 }
 
+//MatchImage
 func MatchImage(m Message) []string {
 	reg := regexp.MustCompile(`[CQ:image,file=.]`)
 	if reg == nil {
