@@ -25,28 +25,57 @@ type Message struct {
 
 type (
 	ConstNoticeType struct {
-		GroupUpload   string
-		GroupAdmin    string
-		GroupDecrease string
-		GroupIncrease string
-		GroupBan      string
-		FriendAdd     string
-		GroupRecall   string
-		FriendRecall  string
-		Notify        string
+		GroupUpload   string //群文件上传
+		GroupAdmin    string //群管理员变动
+		GroupDecrease string //群成员减少
+		GroupIncrease string //群成员增加
+		GroupBan      string //群禁言
+		FriendAdd     string //好友添加
+		GroupRecall   string //群消息撤回
+		FriendRecall  string //好友消息撤回
+		Notify        string //群内戳一戳,群红包运气王,群成员荣誉变更,好友戳一戳
+		GroupCard     string //群成员名片更新
+		OfflineFile   string //接收到离线文件
 	}
 	ConstMessageType struct {
 		Group   string
 		Private string
 	}
+	//ConstMessageSubType struct {
+	//	Friend    string //好友消息
+	//	Group     string //临时会话
+	//	Other     string //其他消息
+	//	Normal    string //正常群消息
+	//	Anonymous string //匿名消息
+	//	Notice    string //群通知消息
+	//}
 )
 
 var (
-	NoticeTypeApi = ConstNoticeType{GroupUpload: "group_upload", GroupAdmin: "group_admin", GroupDecrease: "group_decrease",
-		GroupIncrease: "group_increase", GroupBan: "group_ban", FriendAdd: "friend_add",
-		GroupRecall: "group_recall", FriendRecall: "friend_recall", Notify: "notify"}
 
-	MessageTypeApi = ConstMessageType{Group: "group", Private: "private"}
+	//MessageSubTypeApi = ConstMessageSubType{
+	//	Friend: "friend",
+	//	Group: "group",
+	//	Other: "other",
+	//	Normal: "normal",
+	//	Anonymous: "anonymous",
+	//	Notice: "notice"}
+	NoticeTypeApi = ConstNoticeType{
+		GroupUpload:   "group_upload",
+		GroupAdmin:    "group_admin",
+		GroupDecrease: "group_decrease",
+		GroupIncrease: "group_increase",
+		GroupBan:      "group_ban",
+		FriendAdd:     "friend_add",
+		GroupRecall:   "group_recall",
+		FriendRecall:  "friend_recall",
+		Notify:        "notify",
+		OfflineFile:   "offline_file",
+		GroupCard:     "group_card"}
+
+	MessageTypeApi = ConstMessageType{
+		Group:   "group",
+		Private: "private"}
 )
 
 type MessageIds struct {
@@ -78,11 +107,13 @@ type Event struct {
 	OperatorId    int       `json:"operator_id"`
 	File          Files     `json:"file"`
 	Duration      int64     `json:"duration"`
-	TargetId      int64     `json:"target_id"`
+	TargetId      int64     `json:"target_id"` //运气王id
 	HonorType     string    `json:"honor_type"`
 	MetaEventType string    `json:"meta_event_type"`
 	Status        string    `json:"status"`
 	Interval      string    `json:"interval"`
+	CardNew       string    `json:"card_new"` //新名片
+	CardOld       string    `json:"card_old"` //旧名片
 	MessageIds
 }
 
@@ -120,10 +151,11 @@ type (
 	}
 
 	Files struct {
-		Id    string `json:"id"`
-		Name  string `json:"name"`
-		Size  int64  `json:"size"`
-		Busid int64  `json:"busid"`
+		Id      string `json:"id"`
+		Name    string `json:"name"`
+		Size    int64  `json:"size"`
+		Busid   int64  `json:"busid"`
+		FileUrl string `json:"url"`
 	}
 
 	GroupMemberInfo struct {
