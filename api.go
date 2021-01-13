@@ -470,18 +470,18 @@ type (
 
 type SpecialApi interface {
 	setGroupName(groupId int, groupName string) error
-	setGroupPortrait(groupId int, file string, cache int) error
+	SetGroupPortrait(groupId int, file string, cache int) error
 	getMsg(messageId int) (MsgData, error)
-	getForwardMsg(messageId int) ([]ForwardMsg, error)
-	sendGroupForwardMsg(groupId int, messages []Node) error
-	getWordSlices(content string) ([]string, error)
-	ocrImage(image string) (OcrImage, error)
-	getGroupSystemMsg() (GroupSystemMsg, error)
-	getGroupFileSystemInfo(groupId int) (GroupFileSystemInfo, error)
-	getGroupRootFiles(groupId int) (GroupRootFiles, error)
-	getGroupFilesByFolder(groupId int, folderId string) (GroupFilesByFolder, error)
-	getGroupFileUrl(groupId int, fileId string, busid int) (fileUrl, error)
-	getGroupAtAllRemain(groupId int) (GroupAtAllRemain, error)
+	GetForwardMsg(messageId int) ([]ForwardMsg, error)
+	SendGroupForwardMsg(groupId int, messages []Node) error
+	GetWordSlices(content string) ([]string, error)
+	OcrImage(image string) (OcrImage, error)
+	GetGroupSystemMsg() (GroupSystemMsg, error)
+	GetGroupFileSystemInfo(groupId int) (GroupFileSystemInfo, error)
+	GetGroupRootFiles(groupId int) (GroupRootFiles, error)
+	GetGroupFilesByFolder(groupId int, folderId string) (GroupFilesByFolder, error)
+	GetGroupFileUrl(groupId int, fileId string, busid int) (fileUrl, error)
+	GetGroupAtAllRemain(groupId int) (GroupAtAllRemain, error)
 }
 
 type Api interface {
@@ -1138,7 +1138,7 @@ func (bot Bots) setGroupName(groupId int, groupName string) error {
 	return err
 }
 
-func (bot Bots) setGroupPortrait(groupId int, file string, cache int) error {
+func (bot Bots) SetGroupPortrait(groupId int, file string, cache int) error {
 	url := fmt.Sprintf("http://%s:%d/send_group_portrait", bot.Address, bot.Port)
 	values := url2.Values{}
 	values.Add("group_id", strconv.Itoa(groupId))
@@ -1170,7 +1170,7 @@ func (bot Bots) getMsg(messageId int) (MsgData, error) {
 	return msgJson.Data, err
 }
 
-func (bot Bots) getForwardMsg(messageId int) ([]ForwardMsg, error) {
+func (bot Bots) GetForwardMsg(messageId int) ([]ForwardMsg, error) {
 	url := fmt.Sprintf("http://%s:%d/get_forward_msg", bot.Address, bot.Port)
 	values := url2.Values{}
 	values.Add("message_id", strconv.Itoa(messageId))
@@ -1185,7 +1185,7 @@ func (bot Bots) getForwardMsg(messageId int) ([]ForwardMsg, error) {
 	return forwardMsgJson.Data, err
 }
 
-func (bot Bots) sendGroupForwardMsg(groupId int, messages []Node) error {
+func (bot Bots) SendGroupForwardMsg(groupId int, messages []Node) error {
 	url := fmt.Sprintf("http://%s:%d/send_group_forward_msg", bot.Address, bot.Port)
 	values := url2.Values{}
 	values.Add("group_id", strconv.Itoa(groupId))
@@ -1201,7 +1201,7 @@ func (bot Bots) sendGroupForwardMsg(groupId int, messages []Node) error {
 	return err
 }
 
-func (bot Bots) getWordSlices(content string) ([]string, error) {
+func (bot Bots) GetWordSlices(content string) ([]string, error) {
 	url := fmt.Sprintf("http://%s:%d/.get_word_slices", bot.Address, bot.Port)
 	values := url2.Values{}
 	values.Add("content", content)
@@ -1216,7 +1216,7 @@ func (bot Bots) getWordSlices(content string) ([]string, error) {
 	return wordSliceJson.Data, err
 }
 
-func (bot Bots) ocrImage(image string) (OcrImage, error) {
+func (bot Bots) OcrImage(image string) (OcrImage, error) {
 	url := fmt.Sprintf("http://%s:%d/.ocr_image", bot.Address, bot.Port)
 	values := url2.Values{}
 	values.Add("image", image)
@@ -1231,7 +1231,7 @@ func (bot Bots) ocrImage(image string) (OcrImage, error) {
 	return ocrImageJson.Data, err
 }
 
-func (bot Bots) getGroupSystemMsg() (GroupSystemMsg, error) {
+func (bot Bots) GetGroupSystemMsg() (GroupSystemMsg, error) {
 	url := fmt.Sprintf("http://%s:%d/get_group_system_msg", bot.Address, bot.Port)
 	values := url2.Values{}
 	response, err := http.PostForm(url, values)
@@ -1245,7 +1245,7 @@ func (bot Bots) getGroupSystemMsg() (GroupSystemMsg, error) {
 	return groupSystemMsgJson.Data, err
 }
 
-func (bot Bots) getGroupFileSystemInfo(groupId int) (GroupFileSystemInfo, error) {
+func (bot Bots) GetGroupFileSystemInfo(groupId int) (GroupFileSystemInfo, error) {
 	url := fmt.Sprintf("http://%s:%d/get_group_file_system_info", bot.Address, bot.Port)
 	values := url2.Values{}
 	values.Add("group_id", strconv.Itoa(groupId))
@@ -1260,7 +1260,7 @@ func (bot Bots) getGroupFileSystemInfo(groupId int) (GroupFileSystemInfo, error)
 	return groupFileSystemInfoJson.Data, err
 }
 
-func (bot Bots) getGroupRootFiles(groupId int) (GroupRootFiles, error) {
+func (bot Bots) GetGroupRootFiles(groupId int) (GroupRootFiles, error) {
 	url := fmt.Sprintf("http://%s:%d/get_group_root_files", bot.Address, bot.Port)
 	values := url2.Values{}
 	values.Add("group_id", strconv.Itoa(groupId))
@@ -1275,7 +1275,7 @@ func (bot Bots) getGroupRootFiles(groupId int) (GroupRootFiles, error) {
 	return groupRootFilesJson.Data, err
 }
 
-func (bot Bots) getGroupFilesByFolder(groupId int, folderId string) (GroupFilesByFolder, error) {
+func (bot Bots) GetGroupFilesByFolder(groupId int, folderId string) (GroupFilesByFolder, error) {
 	url := fmt.Sprintf("http://%s:%d/get_group_files_by_folder", bot.Address, bot.Port)
 	values := url2.Values{}
 	values.Add("group_id", strconv.Itoa(groupId))
@@ -1291,7 +1291,7 @@ func (bot Bots) getGroupFilesByFolder(groupId int, folderId string) (GroupFilesB
 	return groupFilesByFolderJson.Data, err
 }
 
-func (bot Bots) getGroupFileUrl(groupId int, fileId string, busid int) (fileUrl, error) {
+func (bot Bots) GetGroupFileUrl(groupId int, fileId string, busid int) (fileUrl, error) {
 	url := fmt.Sprintf("http://%s:%d/get_group_file_url", bot.Address, bot.Port)
 	values := url2.Values{}
 	values.Add("group_id", strconv.Itoa(groupId))
@@ -1308,7 +1308,7 @@ func (bot Bots) getGroupFileUrl(groupId int, fileId string, busid int) (fileUrl,
 	return groupFileUrlJson.Data, err
 }
 
-func (bot Bots) getGroupAtAllRemain(groupId int) (GroupAtAllRemain, error) {
+func (bot Bots) GetGroupAtAllRemain(groupId int) (GroupAtAllRemain, error) {
 	url := fmt.Sprintf("http://%s:%d/get_group_at_all_remain", bot.Address, bot.Port)
 	values := url2.Values{}
 	values.Add("group_id", strconv.Itoa(groupId))
