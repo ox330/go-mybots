@@ -212,8 +212,8 @@ func processMessageHandle() {
 		if checkRule(event, v.RuleChecked) && (content || allies) {
 			args := strings.Split(event.Message, " ")
 			v.CoCommand(event, args)
-			log.Printf("message_type:%s\n\t\t\t\t\tgroup_id:%d\n\t\t\t\t\tuser_id:%d\n\t\t\t\t\tmessage:%s",
-				event.MessageType, event.GroupId, event.UserId, event.Message)
+			log.Printf("message_type:%s\n\t\t\t\t\tgroup_id:%d\n\t\t\t\t\tuser_id:%d\n\t\t\t\t\tmessage:%s"+
+				"\n\t\t\t\t\tthis is a command", event.MessageType, event.GroupId, event.UserId, event.Message)
 			return
 		}
 	}
