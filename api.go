@@ -134,15 +134,6 @@ type responseJson struct {
 	RetCode int    `json:"retcode"`
 }
 
-type Send interface {
-	SendGroupMsg(groupId int, message string, autoEscape bool) int32
-	SendPrivateMsg(userId int, message string, autoEscape bool) int32
-	DeleteMsg(messageId int32)
-	GetMsg(messageId int32) GetMessage
-	SetGroupBan(groupId int, userId int, duration int)
-	SetGroupCard(groupId int, userId int, card string)
-}
-
 type (
 	anonymous struct {
 		Id   int    `json:"id"`
@@ -377,6 +368,22 @@ type (
 		responseJson
 		Data GroupAtAllRemain `json:"data"`
 	}
+	responseDownloadFilePathJson struct {
+		responseJson
+		Data DownloadFilePath `json:"data"`
+	}
+	responseMessageHistoryJson struct {
+		responseJson
+		Data MessageHistory `json:"data"`
+	}
+	responseOnlineClientsJson struct {
+		responseJson
+		Data Clients `json:"data"`
+	}
+	responseVipInfoJson struct {
+		responseJson
+		Data VipInfo `json:"data"`
+	}
 )
 
 type (
@@ -466,12 +473,45 @@ type (
 		RemainAtAllCountForGroup int  `json:"remain_at_all_count_for_group"` //群内所有管理当天剩余@全体成员次数
 		RemainAtAllCountForUin   int  `json:"remain_at_all_count_for_uin"`   //BOT当天剩余@全体成员次数
 	}
+	DownloadFilePath struct {
+		File string `json:"file"`
+	}
+	MessageHistory struct {
+		Messages []string `json:"messages"`
+	}
+	Clients struct {
+		Clients []Device `json:"clients"` //在线客户端列表
+	}
+	Device struct {
+		AppId      int64  `json:"app_id"`      //客户端ID
+		DeviceName string `json:"device_name"` //设备名称
+		DeviceKind string `json:"device_kind"` //设备类型
+	}
+	VipInfo struct {
+		UserId         int64   `json:"user_id"`          //QQ 号
+		Nickname       string  `json:"nickname"`         //用户昵称
+		Level          int64   `json:"level"`            //QQ 等级
+		LevelSpeed     float64 `json:"level_speed"`      //等级加速度
+		VipLevel       string  `json:"vip_level"`        //会员等级
+		VipGrowthSpeed int64   `json:"vip_growth_speed"` //会员成长速度
+		VipGrowthTotal int64   `json:"vip_growth_total"` //会员成长总值
+	}
 )
 
+//go-cqhttp新增api
+type IncreaseApi interface {
+	DownloadFile(url string, threadCount int, headers []string) (DownloadFilePath, error)
+	GetGroupMsgHistory(messageSeq int64, groupId int) (MessageHistory, error)
+	GetOnlineClients(noCache bool) (Clients, error)
+	GetVipInfoTest(UserId int) (VipInfo, error)
+	SendGroupNotice(groupId int64, content string) error
+	ReloadEventFilter()
+}
+
 type SpecialApi interface {
-	setGroupName(groupId int, groupName string) error
+	SetGroupNameSpecial(groupId int, groupName string) error
 	SetGroupPortrait(groupId int, file string, cache int) error
-	getMsg(messageId int) (MsgData, error)
+	GetMsgSpecial(messageId int) (MsgData, error)
 	GetForwardMsg(messageId int) ([]ForwardMsg, error)
 	SendGroupForwardMsg(groupId int, messages []Node) error
 	GetWordSlices(content string) ([]string, error)
@@ -485,6 +525,12 @@ type SpecialApi interface {
 }
 
 type Api interface {
+	SendGroupMsg(groupId int, message string, autoEscape bool) (int32, error)
+	SendPrivateMsg(userId int, message string, autoEscape bool) (int32, error)
+	DeleteMsg(messageId int32) error
+	GetMsg(messageId int32) (GetMessage, error)
+	SetGroupBan(groupId int, userId int, duration int) error
+	SetGroupCard(groupId int, userId int, card string) error
 	SendMsg(messageType string, id int, message string, autoEscape bool) (int32, error)
 	SendLike(userId int, times int) error
 	SetGroupKick(groupId int, UserId int, rejectAddRequest bool) error
@@ -546,6 +592,10 @@ var (
 	groupFilesByFolderJson  responseGroupFilesByFolderJson
 	groupFileUrlJson        responseGroupFileUrlJson
 	groupAtAllRemainJson    responseGroupAtAllRemainJson
+	downloadFilePathJson    responseDownloadFilePathJson
+	messageHistoryJson      responseMessageHistoryJson
+	onlineClientsJson       responseOnlineClientsJson
+	vipInfoJson             responseVipInfoJson
 )
 
 func (bot Bots) SendGroupMsg(groupId int, message string, autoEscape bool) (int32, error) {
@@ -1122,7 +1172,7 @@ func (bot Bots) CleanCache() {
 
 //go-cqhttp  APi
 
-func (bot Bots) setGroupName(groupId int, groupName string) error {
+func (bot Bots) SetGroupNameSpecial(groupId int, groupName string) error {
 	url := fmt.Sprintf("http://%s:%d/send_group_name", bot.Address, bot.Port)
 	values := url2.Values{}
 	values.Add("group_id", strconv.Itoa(groupId))
@@ -1155,7 +1205,7 @@ func (bot Bots) SetGroupPortrait(groupId int, file string, cache int) error {
 	return err
 }
 
-func (bot Bots) getMsg(messageId int) (MsgData, error) {
+func (bot Bots) GetMsgSpecial(messageId int) (MsgData, error) {
 	url := fmt.Sprintf("http://%s:%d/get_msg", bot.Address, bot.Port)
 	values := url2.Values{}
 	values.Add("message_id", strconv.Itoa(messageId))
@@ -1321,6 +1371,43 @@ func (bot Bots) GetGroupAtAllRemain(groupId int) (GroupAtAllRemain, error) {
 	_ = json.Unmarshal(responseByte, &groupAtAllRemainJson)
 	log.Println(url, values.Encode(), "\n\t\t\t\t\t", groupAtAllRemainJson.RetCode, groupAtAllRemainJson.Status)
 	return groupAtAllRemainJson.Data, err
+}
+
+func (bot Bots) DownloadFile(url string, threadCount int, headers []string) (DownloadFilePath, error) {
+	urls := fmt.Sprintf("http://%s:%d/download_file", bot.Address, bot.Port)
+	values := url2.Values{}
+	values.Add("url", url)
+	values.Add("thread_count", strconv.Itoa(threadCount))
+	values.Add("headers", fmt.Sprintf("%v", headers))
+	response, err := http.PostForm(urls, values)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &downloadFilePathJson)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", downloadFilePathJson.RetCode, downloadFilePathJson.Status)
+	return downloadFilePathJson.Data, err
+}
+
+func (bot Bots) GetGroupMsgHistory(messageSeq int64, groupId int) (MessageHistory, error) {
+	panic("implement me")
+}
+
+func (bot Bots) GetOnlineClients(noCache bool) (Clients, error) {
+	panic("implement me")
+}
+
+func (bot Bots) GetVipInfoTest(UserId int) (VipInfo, error) {
+	panic("implement me")
+}
+
+func (bot Bots) SendGroupNotice(groupId int64, content string) error {
+	panic("implement me")
+}
+
+func (bot Bots) ReloadEventFilter() {
+	panic("implement me")
 }
 
 //MessageImage
