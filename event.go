@@ -205,6 +205,10 @@ func checkRule(event Event, RuleChecked []Rule) bool {
 	Message事件处理器。
 */
 func processMessageHandle() {
+	defer func() {
+		err := recover()
+		log.Println(err)
+	}()
 	event := <-c
 	for _, v := range ViewOnCoCommand {
 		content := strings.HasPrefix(event.Message, v.Command)
@@ -237,6 +241,10 @@ func processMessageHandle() {
 	processNoticeHandle方法将postType为Notice的event下发到各个处理器
 */
 func processNoticeHandle(event Event) {
+	defer func() {
+		err := recover()
+		log.Println(err)
+	}()
 	log.Printf("notice_type:%s\n\t\t\t\t\tgroup_id:%d\n\t\t\t\t\tuser_id:%d",
 		event.NoticeType, event.GroupId, event.UserId)
 
@@ -259,6 +267,7 @@ func processNoticeHandle(event Event) {
 	如果时私聊信息，直接返回True
 */
 func (rule RuleCheck) OnlyToMe(event Event) bool {
+
 	if event.MessageType == "group" {
 		return strings.Contains(event.Message, fmt.Sprintf("[CQ:at,qq=%d]", Info.UserId))
 	} else if event.MessageType == "private" {
