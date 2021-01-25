@@ -505,7 +505,7 @@ type IncreaseApi interface {
 	GetOnlineClients(noCache bool) (Clients, error)
 	GetVipInfoTest(UserId int) (VipInfo, error)
 	SendGroupNotice(groupId int64, content string) error
-	ReloadEventFilter()
+	ReloadEventFilter() error
 }
 
 type SpecialApi interface {
@@ -1386,28 +1386,83 @@ func (bot Bots) DownloadFile(url string, threadCount int, headers []string) (Dow
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &downloadFilePathJson)
-	log.Println(url, values.Encode(), "\n\t\t\t\t\t", downloadFilePathJson.RetCode, downloadFilePathJson.Status)
+	log.Println(urls, values.Encode(), "\n\t\t\t\t\t", downloadFilePathJson.RetCode, downloadFilePathJson.Status)
 	return downloadFilePathJson.Data, err
 }
 
 func (bot Bots) GetGroupMsgHistory(messageSeq int64, groupId int) (MessageHistory, error) {
-	panic("implement me")
+	url := fmt.Sprintf("http://%s:%d/get_group_message_history", bot.Address, bot.Port)
+	values := url2.Values{}
+	values.Add("message_seq", strconv.FormatInt(messageSeq, 10))
+	values.Add("group_id", strconv.Itoa(groupId))
+	response, err := http.PostForm(url, values)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &messageHistoryJson)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", messageHistoryJson.RetCode, messageHistoryJson.Status)
+	return messageHistoryJson.Data, err
 }
 
 func (bot Bots) GetOnlineClients(noCache bool) (Clients, error) {
-	panic("implement me")
+	url := fmt.Sprintf("http://%s:%d/get_online_clients", bot.Address, bot.Port)
+	values := url2.Values{}
+	values.Add("no_cache", strconv.FormatBool(noCache))
+	response, err := http.PostForm(url, values)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &onlineClientsJson)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", onlineClientsJson.RetCode, onlineClientsJson.Status)
+	return onlineClientsJson.Data, err
 }
 
 func (bot Bots) GetVipInfoTest(UserId int) (VipInfo, error) {
-	panic("implement me")
+	url := fmt.Sprintf("http://%s:%d/_get_vip_info", bot.Address, bot.Port)
+	values := url2.Values{}
+	values.Add("user_id", strconv.Itoa(UserId))
+	response, err := http.PostForm(url, values)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &vipInfoJson)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", vipInfoJson.RetCode, vipInfoJson.Status)
+	return vipInfoJson.Data, err
 }
 
 func (bot Bots) SendGroupNotice(groupId int64, content string) error {
-	panic("implement me")
+	url := fmt.Sprintf("http://%s:%d/send_group_notice", bot.Address, bot.Port)
+	values := url2.Values{}
+	values.Add("group_id", strconv.FormatInt(groupId, 10))
+	values.Add("content", content)
+	response, err := http.PostForm(url, values)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &defaultJson)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	return err
 }
 
-func (bot Bots) ReloadEventFilter() {
-	panic("implement me")
+func (bot Bots) ReloadEventFilter() error {
+	url := fmt.Sprintf("http://%s:%d/get_group_at_all_remain", bot.Address, bot.Port)
+	response, err := http.PostForm(url, nil)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &defaultJson)
+	log.Println(url, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	return err
 }
 
 //MessageImage
