@@ -506,6 +506,7 @@ type IncreaseApi interface {
 	GetVipInfoTest(UserId int) (VipInfo, error)
 	SendGroupNotice(groupId int64, content string) error
 	ReloadEventFilter() error
+	UploadGroupFile(groupId int, file string, name string, folder string) error
 }
 
 type SpecialApi interface {
@@ -1462,6 +1463,26 @@ func (bot Bots) ReloadEventFilter() error {
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
 	log.Println(url, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	return err
+}
+
+func (bot Bots) UploadGroupFile(groupId int, file string, name string, folder string) error {
+	url := fmt.Sprintf("http://%s:%d/send_group_notice", bot.Address, bot.Port)
+	values := url2.Values{}
+	values.Add("group_id", strconv.Itoa(groupId))
+	values.Add("file", file)
+	values.Add("name", name)
+	if folder != "" {
+		values.Add("folder", folder)
+	}
+	response, err := http.PostForm(url, values)
+	if err != nil {
+		log.Panic("client error")
+	}
+	defer response.Body.Close()
+	responseByte, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(responseByte, &defaultJson)
+	log.Println(url, values.Encode(), "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 	return err
 }
 
