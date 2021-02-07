@@ -1467,7 +1467,7 @@ func (bot Bots) ReloadEventFilter() error {
 }
 
 func (bot Bots) UploadGroupFile(groupId int, file string, name string, folder string) error {
-	url := fmt.Sprintf("http://%s:%d/send_group_notice", bot.Address, bot.Port)
+	url := fmt.Sprintf("http://%s:%d/upload_group_file", bot.Address, bot.Port)
 	values := url2.Values{}
 	values.Add("group_id", strconv.Itoa(groupId))
 	values.Add("file", file)
