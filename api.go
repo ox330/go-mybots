@@ -1467,23 +1467,17 @@ func (bot Bots) ReloadEventFilter() error {
 }
 
 func (bot Bots) UploadGroupFile(groupId int, file string, name string, folder string) error {
-	url := fmt.Sprintf("http://%s:%d/upload_group_file?", bot.Address, bot.Port)
-	values := url2.Values{}
-	values.Add("group_id", strconv.Itoa(groupId))
-	values.Add("file", url2.QueryEscape(file))
-	values.Add("name", name)
-	if folder != "" {
-		values.Add("folder", folder)
-	}
+	url := fmt.Sprintf("http://%s:%d/upload_group_file?group_id=%v&file=%v&name=%v&folder=%v",
+		bot.Address, bot.Port, groupId, file, name, folder)
 
-	response, err := http.Get(url + values.Encode())
+	response, err := http.Get(url)
 	if err != nil {
 		log.Panic("client error")
 	}
 	defer response.Body.Close()
 	responseByte, _ := ioutil.ReadAll(response.Body)
 	_ = json.Unmarshal(responseByte, &defaultJson)
-	log.Println(url, values.Encode(), "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
+	log.Println(url, "\n\t\t\t\t\t", defaultJson.RetCode, defaultJson.Status)
 	return err
 }
 
