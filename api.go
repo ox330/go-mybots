@@ -1470,7 +1470,7 @@ func (bot Bots) UploadGroupFile(groupId int, file string, name string, folder st
 	url := fmt.Sprintf("http://%s:%d/upload_group_file", bot.Address, bot.Port)
 	values := url2.Values{}
 	values.Add("group_id", strconv.Itoa(groupId))
-	values.Add("file", file)
+	values.Add("file", url2.PathEscape(file))
 	values.Add("name", name)
 	if folder != "" {
 		values.Add("folder", folder)
