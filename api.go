@@ -9,7 +9,6 @@ import (
 	"net/http"
 	url2 "net/url"
 	"os"
-	"regexp"
 	"strconv"
 )
 
@@ -1482,20 +1481,7 @@ func (bot Bots) UploadGroupFile(groupId int, file string, name string, folder st
 }
 
 //MessageImage
-func MessageImage(path string) Message {
-	return Message{fmt.Sprintf("[CQ:image.file=file:/%s]", path)}
-}
 
 func MessageAt(UserId int) Message {
 	return Message{fmt.Sprintf("[CQ:at,qq=%d]", UserId)}
-}
-
-//MatchImage
-func MatchImage(m Message) []string {
-	reg := regexp.MustCompile(`[CQ:image,file=.]`)
-	if reg == nil {
-		log.Panic("regexp error")
-	}
-	match := reg.FindAllString(m.Message, -1)
-	return match
 }
