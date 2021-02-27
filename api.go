@@ -10,6 +10,7 @@ import (
 	url2 "net/url"
 	"os"
 	"strconv"
+	"strings"
 )
 
 type Bots struct {
@@ -1347,7 +1348,7 @@ func (bot Bots) GetGroupFileUrl(groupId int, fileId string, busid int) (fileUrl,
 	values.Add("group_id", strconv.Itoa(groupId))
 	values.Add("file_id", fileId)
 	values.Add("busid", strconv.Itoa(busid))
-	response, err := http.PostForm(url, values)
+	response, err := http.Post(url, "application/json", strings.NewReader(values.Encode()))
 	if err != nil {
 		log.Panic("client error")
 	}

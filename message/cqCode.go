@@ -1,9 +1,13 @@
 package message
 
 import (
+	"fmt"
 	"strings"
 )
 
+//详情参考：
+//		https://github.com/howmanybots/onebot/blob/master/v11/specs/message/segment.md#qq-%E8%A1%A8%E6%83%85
+//		https://github.com/Mrs4s/go-cqhttp/blob/master/docs/cqhttp.md#%E5%9B%BE%E7%89%87
 type Message struct {
 	Message string `json:"message"`
 
@@ -36,6 +40,104 @@ type Message struct {
 	Title   string `json:"title"`   //标题
 	Content string `json:"content"` //内容
 	Image   string `json:"image"`   //图片链接，可选
+}
+
+type CQ interface {
+	At() string
+	Face() string
+	NewImage() string
+	Record() string
+	Video() string
+	Rps() string
+	Dice() string
+	Shake() string
+	Share() string
+	Contact() string
+	Location() string
+	Music() string
+	Reply() string
+	Xml() string
+	Json() string
+	Poke() string
+	Gift() string
+	CardImage() string
+	Tts() string
+}
+
+func (m Message) At() string {
+	return fmt.Sprintf("[CQ:at,qq=%v]", m.QQ)
+}
+
+func (m Message) Face() string {
+	return fmt.Sprintf("[CQ:face,id=%v]", m.Id)
+}
+
+func (m Message) NewImage() string {
+	panic("implement me")
+}
+
+func (m Message) Record() string {
+	panic("implement me")
+}
+
+func (m Message) Video() string {
+	panic("implement me")
+}
+
+func (m Message) Rps() string {
+	panic("implement me")
+}
+
+func (m Message) Dice() string {
+	panic("implement me")
+}
+
+func (m Message) Shake() string {
+	panic("implement me")
+}
+
+func (m Message) Share() string {
+	panic("implement me")
+}
+
+func (m Message) Contact() string {
+	panic("implement me")
+}
+
+func (m Message) Location() string {
+	panic("implement me")
+}
+
+func (m Message) Music() string {
+	panic("implement me")
+}
+
+func (m Message) Reply() string {
+	panic("implement me")
+}
+
+func (m Message) Xml() string {
+	panic("implement me")
+}
+
+func (m Message) Json() string {
+	panic("implement me")
+}
+
+func (m Message) Poke() string {
+	panic("implement me")
+}
+
+func (m Message) Gift() string {
+	panic("implement me")
+}
+
+func (m Message) CardImage() string {
+	panic("implement me")
+}
+
+func (m Message) Tts() string {
+	panic("implement me")
 }
 
 //json转义
