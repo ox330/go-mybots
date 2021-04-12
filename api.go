@@ -532,7 +532,7 @@ type Api interface {
 	GetMsg(messageId int32) (GetMessage, error)
 	SetGroupBan(groupId int, userId int, duration int) error
 	SetGroupCard(groupId int, userId int, card string) error
-	SendMsg(messageType string, id int, message string, autoEscape bool) (int32, error)
+	SendMsg(messageType string, userId int, groupId int, message string, autoEscape bool) (int32, error)
 	SendLike(userId int, times int) error
 	SetGroupKick(groupId int, UserId int, rejectAddRequest bool) error
 	SetGroupAnonymousBan(groupId int, flag string, duration int) error
@@ -710,13 +710,13 @@ func (bot Bots) SetGroupCard(groupId int, userId int, card string) error {
 	return err1
 }
 
-func (bot Bots) SendMsg(messageType string, id int, message string, autoEscape bool) (int32, error) {
+func (bot Bots) SendMsg(messageType string, userId int, groupId int, message string, autoEscape bool) (int32, error) {
 	var MessageId int32
 	var err error
 	if messageType == "group" {
-		MessageId, err = bot.SendGroupMsg(id, message, autoEscape)
+		MessageId, err = bot.SendGroupMsg(groupId, message, autoEscape)
 	} else if messageType == "private" {
-		MessageId, err = bot.SendPrivateMsg(id, message, autoEscape)
+		MessageId, err = bot.SendPrivateMsg(userId, message, autoEscape)
 	} else {
 		log.Println("请正确指定messageType的值")
 	}

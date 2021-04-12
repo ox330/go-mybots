@@ -48,31 +48,35 @@ var (
 	Fil             = Filter{}
 	ViewMessage     []ViewMessageApi       //ViewMessage为一个需要上报到各个Message事件的切片
 	ViewNotice      []ViewOnNoticeApi      //ViewNotice为一个需要上报到各个Notice事件的切片
-	ViewRequest     []func(event Event)    //ViewRequest为一个需要上报到各个Request事件的切片
-	ViewMeta        []func(event Event)    //ViewMeta为一个需要上报到各个Meta事件的切片
+	ViewRequest     []MessageFun           //ViewRequest为一个需要上报到各个Request事件的切片
+	ViewMeta        []MessageFun           //ViewMeta为一个需要上报到各个Meta事件的切片
 	ViewOnCoCommand []ViewOnC0CommandApi   //ViewOnCommand为一个需要上报到各个Command事件的切片
 	Info            LoginInfo              //Info为当前账号的信息
 	c               = make(chan Event, 20) //c是一个event类型的通道
 	nextEvent       bool                   //nextEvent是一个决定是否将消息下发的全局变量，当调用GetNextEvent时，该全局变量的值才会发生改变
 )
 
+type MessageFun func(event Event)
+
+type CommandFun func(event Event, args []string)
+
 type (
 	//ViewMessageApi结构体为一个Message消息上报位置，包含了具体的方法和需要传递的Message的MessageType和SubType
 	ViewMessageApi struct {
-		OnMessage   func(event Event)
+		OnMessage   MessageFun
 		MessageType string
 		SubType     string
 	}
 	//ViewOnCommandApi结构体为一个Command上报位置，包含了具体的方法和该命令的具体命令以及别名，RuleChecked为一个Rule切片，
 	ViewOnC0CommandApi struct {
-		CoCommand   func(event Event, args []string)
+		CoCommand   CommandFun
 		Command     string
 		Allies      string
 		RuleChecked []Rule
 	}
 	//ViewOnNoticeApi结构体为一个Notice上报位置，包含了具体的方法和需要传递的Notice的NoticeType和SubType
 	ViewOnNoticeApi struct {
-		OnNotice   func(event Event)
+		OnNotice   MessageFun
 		NoticeType string
 		SubType    string
 	}

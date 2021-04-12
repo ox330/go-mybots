@@ -22,9 +22,9 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a7e19fda-7b40-45ad-9160-10a6baaa0746" name="默认更改列表" comment="增加cq码方法实现">
+    <list default="true" id="a7e19fda-7b40-45ad-9160-10a6baaa0746" name="默认更改列表" comment="add content">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/message/cqCode.go" beforeDir="false" afterPath="$PROJECT_DIR$/message/cqCode.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event.go" beforeDir="false" afterPath="$PROJECT_DIR$/event.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +71,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="go.sdk" />
+    <property name="settings.editor.selected.configurable" value="ssh.settings" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -88,36 +88,36 @@
       <module name="gononebot" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
-      <filePath value="$PROJECT_DIR$/api.go" />
       <package value="github.com/3343780376/go-mybots" />
       <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/api.go" />
       <method v="2" />
     </configuration>
     <configuration name="go build event.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="gononebot" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
-      <filePath value="$PROJECT_DIR$/event.go" />
       <package value="github.com/3343780376/go-mybots" />
       <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/event.go" />
       <method v="2" />
     </configuration>
     <configuration name="go build main.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="gononebot" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
-      <filePath value="$PROJECT_DIR$/example/main.go" />
       <package value="github.com/3343780376/go-mybots" />
       <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/example/main.go" />
       <method v="2" />
     </configuration>
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="gononebot" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
-      <filePath value="$PROJECT_DIR$/main.go" />
       <package value="gononebot" />
       <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/main.go" />
       <method v="2" />
     </configuration>
     <recent_temporary>
@@ -151,7 +151,8 @@
     <MESSAGE value="实现restart接口" />
     <MESSAGE value="commit" />
     <MESSAGE value="增加cq码方法实现" />
-    <option name="LAST_COMMIT_MESSAGE" value="增加cq码方法实现" />
+    <MESSAGE value="add content" />
+    <option name="LAST_COMMIT_MESSAGE" value="add content" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
